@@ -1,0 +1,26 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="backtrader.indicators.SimpleMovingAverage" />
+          <option value="tuple.fast_length" />
+          <option value="tuple.slow_length" />
+          <option value="bt.feeds" />
+          <option value="bt.sizers" />
+          <option value="bt.Cerebro" />
+          <option value="tuple.ticker_name" />
+          <option value="Stock.Stock.groupby" />
+          <option value="Stock.Stock.dataframe" />
+          <option value="tuple.excel_writer" />
+          <option value="tuple.best_combinations" />
+          <option value="tuple.best_results" />
+          <option value="tuple.slippage" />
+          <option value="tuple.commisions" />
+          <option value="pymysql" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
