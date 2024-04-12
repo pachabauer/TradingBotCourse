@@ -16,3 +16,8 @@
 2024-04-09 18:32:31,100 INFO :: This is logged in all cases
 2024-04-09 18:32:36,678 INFO :: This is logged in all cases
 2024-04-09 18:32:36,678 INFO :: This is logged only if we execute the main.py file
+2024-04-11 18:11:11,587 INFO :: Binance Futures Client succesfully initialized
+2024-04-11 18:12:07,124 INFO :: Binance Futures Client succesfully initialized
+2024-04-11 18:16:26,224 INFO :: Binance Futures Client succesfully initialized
+2024-04-11 18:19:35,467 INFO :: Binance Futures Client succesfully initialized
+2024-04-11 18:20:30,382 INFO :: Binance Futures Client succesfully initialized
