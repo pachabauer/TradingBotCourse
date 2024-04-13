@@ -31,8 +31,12 @@ logger.addHandler(file_handler)
 
 if __name__== '__main__':
 
-    binance = BinanceFuturesClient(True)
-    print(binance.get_historical_candles('BTCUSDT', "1h"))
+    # instanciamos la clase BinanceFuturesClient y le pasamos las keys y el True para referirse a testnet
+    binance = BinanceFuturesClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
+                                   "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
+                                   True)
+
+
 
     root = tk.Tk()
 

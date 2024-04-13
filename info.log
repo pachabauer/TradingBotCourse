@@ -21,3 +21,12 @@
 2024-04-11 18:16:26,224 INFO :: Binance Futures Client succesfully initialized
 2024-04-11 18:19:35,467 INFO :: Binance Futures Client succesfully initialized
 2024-04-11 18:20:30,382 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 17:41:28,134 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 17:42:43,898 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 17:42:44,965 ERROR :: Error while making GET request to /fapi/v1/account: {'code': -5000, 'msg': 'GET /fapi/v1/account is retired, please use GET /fapi/v2/account'} (error code 400)
+2024-04-12 17:43:07,180 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 18:09:26,550 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 18:09:27,908 ERROR :: Error while making POST request to /fapi/v2/order: {'code': -5000, 'msg': 'Path /fapi/v2/order, Method POST is invalid'} (error code 404)
+2024-04-12 18:11:21,694 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 18:12:43,555 INFO :: Binance Futures Client succesfully initialized
+2024-04-12 18:14:23,925 INFO :: Binance Futures Client succesfully initialized
