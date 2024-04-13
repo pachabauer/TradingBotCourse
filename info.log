@@ -30,3 +30,13 @@
 2024-04-12 18:11:21,694 INFO :: Binance Futures Client succesfully initialized
 2024-04-12 18:12:43,555 INFO :: Binance Futures Client succesfully initialized
 2024-04-12 18:14:23,925 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 11:03:50,004 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 11:03:51,707 ERROR :: error from callback <bound method BinanceFuturesClient.on_open of <connectors.binance_futures.BinanceFuturesClient object at 0x0000011C8FBB95B0>>: on_open() takes 1 positional argument but 2 were given
+2024-04-13 11:11:06,828 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 11:11:08,642 INFO :: Binance Websocket connection opened
+2024-04-13 11:55:30,077 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 11:55:31,364 INFO :: Binance Websocket connection opened
+2024-04-13 12:04:27,898 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 12:04:29,186 INFO :: Binance Websocket connection opened
+2024-04-13 12:05:36,045 INFO :: Binance Futures Client succesfully initialized
+2024-04-13 12:05:37,370 INFO :: Binance Websocket connection opened

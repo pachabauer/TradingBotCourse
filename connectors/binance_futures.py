@@ -12,6 +12,16 @@ import hashlib
 
 from urllib.parse import urlencode
 
+import websocket
+
+# permite la ejecución de varios threads en simultaneo. Esto permite ejecutar, por ejemplo,
+# un loop infinito en un thread mientras que el programa hace otras tareas en otro thread.
+# De esa manera, puedo establecer una conexión websocket "infinita" (para obtener datos en real time
+# y seguir ejecutando: órdenes, etc.
+import threading
+
+import json
+
 logger = logging.getLogger()
 
 # hacemos una clase que contendrá varios métodos relacionados
@@ -24,8 +34,11 @@ class BinanceFuturesClient:
     def __init__(self, public_key, secret_key, testnet):
         if testnet:
             self.base_url = "https://testnet.binancefuture.com"
+            self.wss_url = "wss://stream.binancefuture.com/ws"
         else:
             self.base_url = "https://fapi.binance.com"
+            self.wss_url = "wss://fstream.binance.com/ws"
+
 
         self.public_key = public_key
         self.secret_key = secret_key
@@ -34,6 +47,12 @@ class BinanceFuturesClient:
         self.headers = {'X-MBX-APIKEY': self.public_key}
 
         self.prices = dict()
+
+        self.id = 1
+        self.ws = None
+
+        t = threading.Thread(target=self.start_ws)
+        t.start()
 
         logger.info("Binance Futures Client succesfully initialized")
 
@@ -160,3 +179,62 @@ class BinanceFuturesClient:
         order_status = self.make_request("GET", "/fapi/v1/order", data)
 
         return order_status
+
+    def start_ws(self):
+
+        # lleva como argumentos: url y callback functions
+        self.ws = websocket.WebSocketApp(self.wss_url, on_open=self.on_open, on_close=self.on_close,
+                                    on_error=self.on_error, on_message=self.on_message)
+
+        # inicia el loop infinito esperando mensajes del websocket server
+        self.ws.run_forever()
+
+    def on_open(self,ws):
+        logger.info("Binance Websocket connection opened")
+        self.subscribe_channel("BTCUSDT")
+
+    def on_close(self,ws):
+        logger.warning("Binance Websocket connection closed")
+
+    def on_error(self, ws, msg):
+        logger.error("Binance Websocket connection error: %s", msg)
+
+    def on_message(self, ws, msg):
+
+        # Una vez recibidos los datos del ws, convierto el jsonString a jsonObject, a fin de mostrarlo claramente
+        data = json.loads(msg)
+
+        # la e se refiere al evento (al canal) del cual estoy recibiendo la información
+        if "e" in data:
+            if data['e'] == "bookTicker":
+
+                symbol = data['s']
+                if symbol not in self.prices:
+                    self.prices[symbol] = {'bid': float(data['b']), 'ask': float(data['a'])}
+                else:
+                    self.prices[symbol]['bid'] = float(data['b'])
+                    self.prices[symbol]['ask'] = float(data['a'])
+
+                print(self.prices[symbol])
+
+
+
+    # Para obtener data, necesito suscribirme a "canales". Esto es, una especie de endpoint, que envía datos
+    # los cuales son recibidos por el ws y transmitidos al programa
+    # https://binance-docs.github.io/apidocs/testnet/en/#live-subscribing-unsubscribing-to-streams
+    def subscribe_channel(self, symbol):
+        data = dict()
+        data['method'] = "SUBSCRIBE"
+        data['params'] = []
+
+        # ver documentación : ticker en minusculas mas el @ y el bookTicker
+        data['params'].append(symbol.lower() + "@bookTicker")
+        data['id'] = self.id
+
+        # La función json.dumps() convertirá un subconjunto de objetos de Python en una cadena json.
+        # No todos los objetos son convertibles
+        # es posible que necesites crear un diccionario de datos antes de serializarlos a JSON
+        # Hago esto ya que necesito pasarle un JSON String al self.ws.send()
+        self.ws.send(json.dumps(data))
+
+        self.id += 1
