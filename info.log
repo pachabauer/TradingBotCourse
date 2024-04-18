@@ -40,3 +40,18 @@
 2024-04-13 12:04:29,186 INFO :: Binance Websocket connection opened
 2024-04-13 12:05:36,045 INFO :: Binance Futures Client succesfully initialized
 2024-04-13 12:05:37,370 INFO :: Binance Websocket connection opened
+2024-04-16 13:34:00,358 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 13:34:02,096 INFO :: Binance Websocket connection opened
+2024-04-16 13:34:02,096 ERROR :: error from callback <bound method BinanceFuturesClient._on_open of <connectors.binance_futures.BinanceFuturesClient object at 0x00000234E63BB070>>: 'method' object is not subscriptable
+2024-04-16 13:46:11,966 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 13:46:13,319 INFO :: Binance Websocket connection opened
+2024-04-16 13:47:31,966 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 13:47:33,267 INFO :: Binance Websocket connection opened
+2024-04-16 13:49:21,146 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 13:49:22,411 INFO :: Binance Websocket connection opened
+2024-04-16 15:05:22,729 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 15:05:24,059 INFO :: Binance Websocket connection opened
+2024-04-16 15:05:55,796 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 15:05:57,101 INFO :: Binance Websocket connection opened
+2024-04-16 15:06:39,768 INFO :: Binance Futures Client succesfully initialized
+2024-04-16 15:06:41,061 INFO :: Binance Websocket connection opened

@@ -36,7 +36,14 @@ if __name__== '__main__':
                                    "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
                                    True)
 
-
+    contracts = binance.get_contracts()
+    for symbol, contract in contracts.items():
+        print(f"Símbolo: {symbol}")
+        print(f"Base Asset: {contract.base_asset}")
+        print(f"Quote Asset: {contract.quote_asset}")
+        print(f"Precisión del Precio: {contract.price_decimals}")
+        print(f"Precisión de la Cantidad: {contract.quantity_decimals}")
+        print()
 
     root = tk.Tk()
 
