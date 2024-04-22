@@ -70,7 +70,7 @@ class BinanceFuturesClient:
         # encode() sirve para convertir el string a byte
         return hmac.new(self._secret_key.encode(), urlencode(data).encode(), hashlib.sha256).hexdigest()
 
-    # method se refiere a los de Http (GET, POST, etc) y el endpoint apunta a la url que usaremos (test o real)
+    # method se refiere a los de Http (GET, POST, etc) y el endpoint apunta a la url que usaremos (ver bien test o real)
     def _make_request(self, method: str, endpoint: str, data: typing.Dict):
         if method == "GET":
             try:
@@ -101,8 +101,8 @@ class BinanceFuturesClient:
                          method, endpoint, response.json(), response.status_code)
             return None
 
+    # --> refiere al tipo que va a devolver el método
     def get_contracts(self) -> typing.Dict[str, Contract]:
-        # como parámetro data del método make_request no hace falta poner nada (ver docs Binance) , por eso va None
         exchange_info = self._make_request("GET", "/fapi/v1/exchangeInfo", dict())
 
         contracts = dict()
@@ -110,7 +110,7 @@ class BinanceFuturesClient:
         if exchange_info is not None:
             for contract_data in exchange_info['symbols']:
                 # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
-                contracts[contract_data['pair']] = Contract(contract_data)
+                contracts[contract_data['pair']] = Contract(contract_data, "binance")
 
         return contracts
 
@@ -138,6 +138,8 @@ class BinanceFuturesClient:
         ob_data = self._make_request("GET", "/fapi/v1/ticker/bookTicker", data)
 
         if ob_data is not None:
+            # si el contract.symbol no está en prices (al principio nunca estará), lo agrega.
+            # si ya está, lo actualiza.
             if contract.symbol not in self.prices:
                 self.prices[contract.symbol] = {'bid': float(ob_data['bidPrice']), 'ask': float(ob_data['askPrice'])}
             else:
@@ -147,6 +149,9 @@ class BinanceFuturesClient:
             return self.prices[contract.symbol]
 
     def get_balances(self) -> typing.Dict[str, Balance]:
+        # genero los datos para identificarse, para pasarle al make_request(). El timestamp lo saca de la hora local
+        # de la pc, la cual debe estar sincronizada con el huso horario local, ya que sino podría fallar con
+        # el time definido por Binance (en este caso) en su servidor.
         data = dict()
         data['timestamp'] = int(time.time() * 1000)
         data['signature'] = self._generate_signature(data)
@@ -156,7 +161,7 @@ class BinanceFuturesClient:
 
         if account_data is not None:
             for a in account_data['assets']:
-                balances[a['asset']] = Balance(a)
+                balances[a['asset']] = Balance(a, "binance")
 
         return balances
 
@@ -230,6 +235,7 @@ class BinanceFuturesClient:
 
     def _on_open(self,ws):
         logger.info("Binance Websocket connection opened")
+        # Acá se suscribe al channel bookTicker
         self.subscribe_channel(list(self.contracts.values()), "bookTicker")
 
     def _on_close(self,ws):

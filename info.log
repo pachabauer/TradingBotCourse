@@ -55,3 +55,28 @@
 2024-04-16 15:05:57,101 INFO :: Binance Websocket connection opened
 2024-04-16 15:06:39,768 INFO :: Binance Futures Client succesfully initialized
 2024-04-16 15:06:41,061 INFO :: Binance Websocket connection opened
+2024-04-19 09:41:35,878 ERROR :: Error while making GET request to /instrument/active: {'error': {'message': 'Signature not valid.', 'name': 'HTTPError'}} (error code 401)
+2024-04-22 11:56:25,852 INFO :: Binance Futures Client succesfully initialized
+2024-04-22 11:56:25,899 ERROR :: Connection error while making GET request to api/v1/instruments/active: HTTPSConnectionPool(host='testnet.bitmex.comapi', port=443): Max retries exceeded with url: /v1/instruments/active (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x00000135F84B5880>: Failed to resolve 'testnet.bitmex.comapi' ([Errno 11001] getaddrinfo failed)"))
+2024-04-22 11:56:26,506 INFO :: Bitmex Client succesfully initialized
+2024-04-22 11:56:27,225 INFO :: Binance Websocket connection opened
+2024-04-22 11:58:03,516 INFO :: Binance Futures Client succesfully initialized
+2024-04-22 11:58:03,889 ERROR :: Error while making GET request to /api/v1/instruments/active: {'error': {'message': 'Not Found', 'name': 'HTTPError'}} (error code 404)
+2024-04-22 11:58:04,232 INFO :: Bitmex Client succesfully initialized
+2024-04-22 11:58:04,817 INFO :: Binance Websocket connection opened
+2024-04-22 11:59:26,680 INFO :: Binance Futures Client succesfully initialized
+2024-04-22 11:59:27,125 ERROR :: Error while making GET request to /api/v1/instruments/active: {'error': {'message': 'Not Found', 'name': 'HTTPError'}} (error code 404)
+2024-04-22 11:59:27,453 INFO :: Bitmex Client succesfully initialized
+2024-04-22 11:59:27,952 INFO :: Binance Websocket connection opened
+2024-04-22 12:02:13,388 INFO :: Binance Futures Client succesfully initialized
+2024-04-22 12:02:14,436 ERROR :: Error while making GET request to /api/v1/instruments/active: {'error': {'message': 'Not Found', 'name': 'HTTPError'}} (error code 404)
+2024-04-22 12:02:14,679 INFO :: Binance Websocket connection opened
+2024-04-22 12:02:14,789 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:34:02,322 ERROR :: Error while making GET request to /api/v1/instruments/active: {'error': {'message': 'Not Found', 'name': 'HTTPError'}} (error code 404)
+2024-04-22 12:46:39,454 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:48:10,265 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:49:47,155 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:50:11,344 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:51:00,197 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:51:15,935 INFO :: Bitmex Client succesfully initialized
+2024-04-22 12:53:42,428 INFO :: Bitmex Client succesfully initialized

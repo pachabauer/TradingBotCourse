@@ -1,6 +1,7 @@
 import tkinter as tk
 import logging
 from connectors.binance_futures import BinanceFuturesClient
+from connectors.bitmex_futures import BitmexClient
 
 logger = logging.getLogger()
 
@@ -32,18 +33,27 @@ logger.addHandler(file_handler)
 if __name__== '__main__':
 
     # instanciamos la clase BinanceFuturesClient y le pasamos las keys y el True para referirse a testnet
-    binance = BinanceFuturesClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
-                                   "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
-                                   True)
+    # binance = BinanceFuturesClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
+    #                                "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
+    #                                True)
 
-    contracts = binance.get_contracts()
-    for symbol, contract in contracts.items():
-        print(f"Símbolo: {symbol}")
-        print(f"Base Asset: {contract.base_asset}")
-        print(f"Quote Asset: {contract.quote_asset}")
-        print(f"Precisión del Precio: {contract.price_decimals}")
-        print(f"Precisión de la Cantidad: {contract.quantity_decimals}")
-        print()
+    # contracts = binance.get_contracts()
+    # for symbol, contract in contracts.items():
+    #     print(f"Símbolo: {symbol}")
+    #     print(f"Base Asset: {contract.base_asset}")
+    #     print(f"Quote Asset: {contract.quote_asset}")
+    #     print(f"Precisión del Precio: {contract.price_decimals}")
+    #     print(f"Precisión de la Cantidad: {contract.quantity_decimals}")
+    #     print()
+
+    bitmex = BitmexClient('IrMjnDtKOJPa4vKQdY8eEFmK', 'RmxMg044vAPb2Kr8uF1YUbUzElba_yVoG3XKolFuXv2kcPGW', True)
+
+
+
+    print(bitmex.contracts['XBTUSD'].base_asset, bitmex.contracts['XBTUSD'].price_decimals)
+    print(bitmex.balances['XBt'].wallet_balance)
+
+    #contracts = bitmex.get_contracts()
 
     root = tk.Tk()
 
