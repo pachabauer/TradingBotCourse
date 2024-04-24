@@ -48,13 +48,10 @@ if __name__== '__main__':
 
     bitmex = BitmexClient('IrMjnDtKOJPa4vKQdY8eEFmK', 'RmxMg044vAPb2Kr8uF1YUbUzElba_yVoG3XKolFuXv2kcPGW', True)
 
+    print(bitmex.place_order(bitmex.contracts['XBTUSD'], 'Limit', 120.4, "Buy", 95000.65498797489, "GoodTillCancel"))
 
-
-    print(bitmex.contracts['XBTUSD'].base_asset, bitmex.contracts['XBTUSD'].price_decimals)
-    print(bitmex.balances['XBt'].wallet_balance)
-
-    #contracts = bitmex.get_contracts()
-
+    #print(bitmex.place_order(bitmex.contracts['XBTUSD'], "Limit", 100, "Buy", price=20000, tif="GoodTillCancel").order_id)
+    # print(bitmex.cancel_order('c724de73-5cd7-4f0c-bce7-4f0caf123bdc').status)
     root = tk.Tk()
 
     # mainloop() hace que la ventana no se cierre automaticamente,
