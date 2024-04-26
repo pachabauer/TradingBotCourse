@@ -34,6 +34,11 @@ class BitmexClient:
         self.balances = self.get_balances()
         self.prices = dict()
 
+        # agrego una lista de logs, que son los que se van a ir mostrando en la interface visual al usuario
+        self.logs = []
+
+
+
         # Hay 3 diferencias entre el WS de Bitmex y Binance:
         #   1- La URL
         #   2- La data que recibimos en el on_message() está estructurada diferente
@@ -44,6 +49,10 @@ class BitmexClient:
         t.start()
 
         logger.info("Bitmex Client succesfully initialized")
+
+    def _add_log(self, msg: str):
+        logger.info("%s", msg)
+        self.logs.append({"log":msg, "displayed":False})
 
     # Acá cambian la cantidad de parámetros para el signature, ya que así lo especifica la documentación de Bitmex.
     def _generate_signature(self, method: str, endpoint: str, expires: str, data: typing.Dict) -> str:
@@ -245,6 +254,7 @@ class BitmexClient:
                         self.prices[symbol]['bid'] = d['bidPrice']
                     if 'askPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
+
 
     def subscribe_channel(self, topic: str):
         data = dict()

@@ -55,6 +55,8 @@ class BinanceFuturesClient:
 
         self.prices = dict()
 
+        self.logs = []
+
         self._ws_id = 1
         self._ws = None
 
@@ -62,6 +64,10 @@ class BinanceFuturesClient:
         t.start()
 
         logger.info("Binance Futures Client succesfully initialized")
+
+    def _add_log(self, msg: str):
+        logger.info("%s", msg)
+        self.logs.append({"log":msg, "displayed":False})
 
     # typing es una librería que nos permite asignar un dato como Objeto. Como Integer en java (en vez de int)
     # el _ delante del método, lo indica como privado de la clase. No lo puedo usar de cualquier instancia
