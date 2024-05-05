@@ -1,6 +1,7 @@
+# Importamos el módulo tkinter y el módulo typing.
+# Importamos todo desde el módulo models y las configuraciones de estilo desde interface.styling
 import tkinter as tk
 import typing
-
 from models import *
 from interface.styling import *
 
@@ -8,20 +9,22 @@ from interface.styling import *
 class Watchlist(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
     # de ellos y no sea posible agregar o escribir cualquier cosa.
+
     def __init__(self, binance_contracts: typing.Dict[str, Contract], bitmex_contracts: typing.Dict[str, Contract],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Se crean listas de símbolos para los contratos de Binance y Bitmex.
         self.binance_symbols = list(binance_contracts.keys())
         self.bitmex_symbols = list(bitmex_contracts.keys())
 
+        # Se crean dos marcos (Frame) para los controles de la interfaz y la tabla de visualización.
         self._commands_frame = tk.Frame(self, bg=BG_COLOR)
         self._commands_frame.pack(side=tk.TOP)
-
-        # es el frame de abajo que se usará para mostrar la crypto agregada a la watchlist
         self._table_frame = tk.Frame(self, bg=BG_COLOR)
         self._table_frame.pack(side=tk.TOP)
 
+        # Se crea una etiqueta para Binance y se coloca en el marco de comandos.
         # es el frame de arriba que se usará para ingresar una crypto y agregarla a la watchlist
         self._binance_label = tk.Label(self._commands_frame, text="Binance", bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
         # con el grid() especifico, en este caso que irá top left (row=0, column=0)
@@ -47,14 +50,14 @@ class Watchlist(tk.Frame):
         self._bitmex_entry.bind("<Return>", self._add_bitmex_symbol)
         self._bitmex_entry.grid(row=1, column=1)
 
-        # creo un diccionario para almacenar las labels que irán en las filas del widget
+        # Se crean diccionarios para almacenar widgets y una lista de encabezados.
         self.body_widgets = dict()
-
         self._headers = ["symbol", "exchange", "bid", "ask", "remove"]
 
         # la función enumerate nos permite acceder al mismo tiempo al valor del elemento de la lista (h)
         # y a la posición (idx)
         # La idea del for es popular los datos de las widgets dinámicamente
+        # Se crean etiquetas de encabezado y se colocan en la primera fila de la tabla.
         for idx, h in enumerate(self._headers):
             # uso el inline if para decir si tiene datos, mostrá el remove, sino ""
             header = tk.Label(self._table_frame, text=h.capitalize() if h != "remove" else "", bg=BG_COLOR, fg=FG_COLOR,
@@ -63,6 +66,7 @@ class Watchlist(tk.Frame):
 
         # itero para completar dinámicamente las etiquetas del widget
         # symbol, exchange, bid, ask
+        # Se inicializan los diccionarios para almacenar widgets y variables.
         for h in self._headers:
             self.body_widgets[h] = dict()
             # Aca agrego las variables que alimentarán mas adelante el widget en el método
