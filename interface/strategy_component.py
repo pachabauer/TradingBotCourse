@@ -29,6 +29,12 @@ class StrategyEditor(tk.Frame):
         self.body_widgets = dict()
         self._headers = ["Strategy", "Contract", "Timeframe", "Balance %", "TP %", "SL %"]
 
+        # cada vez que agregue una nueva estrategia (una nueva fila) guardare los valores de los parametros
+        # en este diccionario
+        self._additional_parameters = dict()
+
+        self._extra_input = dict()
+
         # Son los widgets que iré completando a lo largo del frame en forma dinámica pertenecientes a los headers.
         # Cómo no son todos los widgets iguales (botones, etiquetas, etc) voy a crear un diccionario que describe
         # a los widgets que iré agregando y los meto todos en una lista
@@ -63,12 +69,12 @@ class StrategyEditor(tk.Frame):
             # breakout, ya que en el curso solo muestran uno de cada uno, entonces no agrupan el indicador
             # con sus parámetros, sino que los mandan directo dentro de la lista.
             "Technical": [
-                {"code_name": "ema_fast", "name": "MACD Fast Lenght", "widget": tk.Entry, "data": int},
-                {"code_name": "ema_slow", "name": "MACD Slow Lenght", "widget": tk.Entry, "data": int},
-                {"code_name": "ema_signal", "name": "MACD Signal Lenght", "widget": tk.Entry, "data": int}
+                {"code_name": "ema_fast", "name": "MACD Fast Lenght", "widget": tk.Entry, "data_type": int},
+                {"code_name": "ema_slow", "name": "MACD Slow Lenght", "widget": tk.Entry, "data_type": int},
+                {"code_name": "ema_signal", "name": "MACD Signal Lenght", "widget": tk.Entry, "data_type": int}
             ],
             "Breakout": [
-                {"code_name": "min_volume", "name": "Minimum Volume", "widget": tk.Entry, "data": float}
+                {"code_name": "min_volume", "name": "Minimum Volume", "widget": tk.Entry, "data_type": float}
             ],
         }
 
@@ -117,7 +123,7 @@ class StrategyEditor(tk.Frame):
                 # la parte del command es un quilombo, así que lo explico: el command es lo que dispara el botón
                 # al hacer click. En este caso dispara un callback, mediante el lambda method. Pero "guardamos"
                 # ese valor disparado por el callback en una variable frozen para que no cambie cada vez
-                # que iteramos sobre ese método y quede fijada. 
+                # que iteramos sobre ese método y quede fijada.
                 self.body_widgets[code_name][b_index] = tk.Button(self._table_frame, text=base_param['text'],
                                                                   bg=base_param['bg'], fg= FG_COLOR,
                                                                   command=lambda frozen_command =
@@ -127,6 +133,16 @@ class StrategyEditor(tk.Frame):
                 continue
 
             self.body_widgets[code_name][b_index].grid(row=b_index, column= col)
+
+        # Lo uso para crear parametros adicionales necesarios para determinada estrategia
+        self._additional_parameters[b_index] = dict()
+
+        # itera sobre Technical y Breakout (las estrategias).
+        for strat, params in self._extra_params.items():
+            # Itera sobre los diccionarios dentro de Technical y Breakout
+            for param in params:
+                self._additional_parameters[b_index][param['code_name']] = None
+
 
         self._body_index += 1
 
@@ -168,12 +184,16 @@ class StrategyEditor(tk.Frame):
             temp_label.grid(row = row_nb, column=0)
 
             if param['widget'] == tk.Entry:
-                temp_input = tk.Entry(self._popup_window, bg=BG_COLOR2, justify=tk.CENTER, fg=FG_COLOR,
+                self._extra_input[code_name] = tk.Entry(self._popup_window, bg=BG_COLOR2, justify=tk.CENTER, fg=FG_COLOR,
                                       insertbackground=FG_COLOR)
+
+                if self._additional_parameters[b_index][code_name] is not None :
+                    self._extra_input[code_name].insert(tk.END, str(self._additional_parameters[b_index][code_name]))
+
             else:
                 continue
 
-            temp_input.grid(row=row_nb, column=1)
+            self._extra_input[code_name].grid(row=row_nb, column=1)
 
             row_nb += 1
 
@@ -188,7 +208,21 @@ class StrategyEditor(tk.Frame):
 
 
     def _validate_parameters(self, b_index: int):
-        return
+
+        # Identifico la estrategia utilizada para crear los inputs de los parameters dinámicamente (en base a la
+        # estrategia)
+        strat_selected = self.body_widgets['strategy_type_var'][b_index].get()
+
+        for param in self._extra_params[strat_selected]:
+            code_name = param['code_name']
+
+            if self._extra_input[code_name].get() == "":
+                self._additional_parameters[b_index][code_name] = None
+            else :
+                self._additional_parameters[b_index][code_name] = param['data_type'](self._extra_input[code_name].get())
+
+        # cuando presionamos el botón de validate del popup de parámetros, se borra la ventana de popup
+        self._popup_window.destroy()
 
 
 
