@@ -3,16 +3,37 @@
 import tkinter as tk
 import typing
 from interface.styling import *
+from connectors.binance_futures import BinanceFuturesClient
+from connectors.bitmex_futures import BitmexClient
 
 class StrategyEditor(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
     # de ellos y no sea posible agregar o escribir cualquier cosa.
+    # agrego 2 parámetros  binance y bitmex, ya que para cambiar de estrategia en el switch_strategy()
+    # necesitaré acceder a los conectores debido a que voy a detener la conexión a un exchange y conectarme al otro
+    # y viceversa.
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, root, binance: BinanceFuturesClient, bitmex: BitmexClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._all_contracts = ["BTCUSDT", "ETHUSDT"]
+        # Creo la variable de instancia que pasé como argumento, ya que así podré acceder al método add_log() del
+        # root_component para mostrar un mensaje de log en la interface si el switch_strategy() devuelve return
+        # debido a que no se ingresaron la totalidad de los parámetros.
+        self.root = root
+
+        # Accedo a los conectores para el método switch_strategy()
+        self._exchanges = {"Binance": binance, "Bitmex": bitmex}
+
+        self._all_contracts = []
         self._all_timeframes = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"]
+
+        # para popular el contract_list de _all_contracts[]
+        for exchange, client in self._exchanges.items():
+            # para iterar por cada contrato que aparezca del client
+            for symbol, contract in client.contracts.items():
+                self._all_contracts.append(symbol + "_" + exchange.capitalize())
+
+
 
         # Se crean dos marcos (Frame) para los controles de la interfaz y la tabla de visualización.
         self._commands_frame = tk.Frame(self, bg=BG_COLOR)
@@ -226,8 +247,62 @@ class StrategyEditor(tk.Frame):
 
 
 
-
+    # Tendrá 2 funcionalidades:
+    # Una para activar o desactivar la estrategia
+    # Una para confirmar que todos los parámetros requeridos de la estrategia fueron ingresados para poder activarla.
     def _switch_strategy(self, b_index: int):
+
+        # chequeamos los 3 parámetros comunes a cualquier estrategia
+        for param in ["balance_pct", "take_profit", "stop_loss"]:
+            # Si ese entry devuelve vacío, es decir que nada de eso tiene datos, quiere decir que no completé
+            # la estrategia correctamente, por ende, no permitirá ingresarla y devolverá con el return
+            if self.body_widgets[param][b_index].get() == "":
+                self.root.logging_frame.add_log(f"Missing {param} parameter")
+                return
+
+        # Ahora viene la parte para chequear que todos los parámetros particulares de cada estrategia sean
+        # completados por el usuario
+        strat_selected = self.body_widgets['strategy_type_var'][b_index].get()
+
+        for param in self._extra_params[strat_selected]:
+            if self._additional_parameters[b_index][param['code_name']] is None:
+                self.root.logging_frame.add_log(f"Missing {param['code_name']} parameter")
+                return
+
+        # Si están completados todos los parámetros requeridos, avanzo y los guardo
+        # Por ejemplo el symbol BTCUSDT_BINANCE , la primer parte [0] es el contrato y la segunda el exchange
+        symbol = self.body_widgets['contract_var'][b_index].get().split("_")[0]
+        exchange = self.body_widgets['contract_var'][b_index].get().split("_")[1]
+
+        timeframe = self.body_widgets['timeframe_var'][b_index].get()
+        balance_pct = float(self.body_widgets['balance_pct'][b_index].get())
+        take_profit = float(self.body_widgets['take_profit'][b_index].get())
+        stop_loss = float(self.body_widgets['stop_loss'][b_index].get())
+
+        # Si el botón está en OFF
+        if self.body_widgets['activation'][b_index].cget("text") == "OFF":
+            # Activar estrategia
+            for param in self._base_params:
+                code_name = param['code_name']
+                if code_name != "activation" and "_var" not in code_name:
+                    self.body_widgets[code_name][b_index].config(state= tk.DISABLED)
+
+            # cambio el color y valor del botón clickeado (ya que quedó disabled)
+            self.body_widgets["activation"][b_index].config(bg= "darkgreen", text= "ON")
+            self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} started")
+
+        else:
+            # Desactivar estrategia
+            for param in self._base_params:
+                code_name = param['code_name']
+                if code_name != "activation" and "_var" not in code_name:
+                    self.body_widgets[code_name][b_index].config(state= tk.NORMAL)
+
+            # cambio el color y valor del botón clickeado (ya que quedó disabled)
+            self.body_widgets["activation"][b_index].config(bg= "darkred", text= "OFF")
+            self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} stopped")
+
+
         return
 
     def _delete_row(self, b_index: int):
