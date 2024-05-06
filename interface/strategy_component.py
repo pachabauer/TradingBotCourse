@@ -5,6 +5,7 @@ import typing
 from interface.styling import *
 from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
+from strategies import TechnicalStrategy, BreakoutStrategy
 
 class StrategyEditor(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
@@ -274,6 +275,8 @@ class StrategyEditor(tk.Frame):
         symbol = self.body_widgets['contract_var'][b_index].get().split("_")[0]
         exchange = self.body_widgets['contract_var'][b_index].get().split("_")[1]
 
+        contract = self._exchanges[exchange].contracts[symbol]
+
         timeframe = self.body_widgets['timeframe_var'][b_index].get()
         balance_pct = float(self.body_widgets['balance_pct'][b_index].get())
         take_profit = float(self.body_widgets['take_profit'][b_index].get())
@@ -281,6 +284,17 @@ class StrategyEditor(tk.Frame):
 
         # Si el botón está en OFF
         if self.body_widgets['activation'][b_index].cget("text") == "OFF":
+
+            # Agrego una validación de que estrategia elijo para crear una clase y usar sus métodos
+            if strat_selected == "Technical":
+                new_strategy = TechnicalStrategy(contract, exchange, timeframe, balance_pct, take_profit, stop_loss,
+                                                 self._additional_parameters[b_index])
+            elif strat_selected == "Breakout":
+                new_strategy = BreakoutStrategy(contract, exchange, timeframe, balance_pct, take_profit, stop_loss,
+                                                 self._additional_parameters[b_index])
+            else:
+                return
+
             # Activar estrategia
             for param in self._base_params:
                 code_name = param['code_name']
