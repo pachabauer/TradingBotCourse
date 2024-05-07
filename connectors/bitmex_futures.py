@@ -6,10 +6,12 @@ import hashlib
 import websocket
 import json
 import typing
-import pprint
+import dateutil.parser
 import threading
 from models import *
 from urllib.parse import urlencode
+
+from strategies import TechnicalStrategy, BreakoutStrategy
 
 logger = logging.getLogger()
 
@@ -33,6 +35,10 @@ class BitmexClient:
         self.contracts = self.get_contracts()
         self.balances = self.get_balances()
         self.prices = dict()
+
+        # Agrego variable para almacenar las candles de cada estrategia que inicie
+        # el Union significa que puede adoptar un valor u otro "Technical o Breakout"
+        self.strategies: typing.Dict[int, typing.Union[TechnicalStrategy, BreakoutStrategy]] = dict()
 
         # agrego una lista de logs, que son los que se van a ir mostrando en la interface visual al usuario
         self.logs = []
@@ -227,8 +233,11 @@ class BitmexClient:
 
     def _on_open(self, ws):
         logger.info("Bitmex Websocket connection opened")
-        # Acá se suscribe al channel bookTicker
+        # Acá se suscribe al channel instrument
         self.subscribe_channel('instrument')
+
+        # Acá se suscribe al channel trade para sacar datos de las velas del websocket
+        self.subscribe_channel("trade")
 
     def _on_close(self, ws):
         logger.warning("Bitmex Websocket connection closed")
@@ -254,6 +263,22 @@ class BitmexClient:
                         self.prices[symbol]['bid'] = d['bidPrice']
                     if 'askPrice' in d:
                         self.prices[symbol]['ask'] = d['askPrice']
+
+            if data['table'] == "trade":
+
+                for d in data['data']:
+
+                    symbol = d['symbol']
+                    # convierto de ISO 8601 a timestamp y como queda en milisegundos multiplico por 1000 para pasar
+                    # a segundos  y luego lo paso a int
+                    ts = int(dateutil.parser.isoparse(d['timestamp']).timestamp() * 1000)
+
+                    # Hago loop en la estrategia cada vez que recibo nueva información de precios de candles
+                    # para ir viendo como afecta el nuevo precio a la estrategia (TP, SL , etc)
+                    for key, strat in self.strategies.items():
+                        if strat.contract.symbol == symbol:
+                            # paso para parsear el trade: precio (p), quantity (q) y timestamp (T)
+                            strat.parse_trades(float(d['price']), float(d['size']), ts)
 
 
     def subscribe_channel(self, topic: str):

@@ -295,6 +295,18 @@ class StrategyEditor(tk.Frame):
             else:
                 return
 
+            # las candles de la nueva estrategia, van al [exchange] (BinanceClient o BitmexClient)
+            new_strategy.candles = self._exchanges[exchange].get_historical_candles(contract, timeframe)
+
+            # si el len de la lista es 0, no ha traído datos del exchange, por ende hay un error de request y lo informo
+            if len(new_strategy.candles) == 0:
+                self.root.logging_frame.add_log(f"No historical data retrieved for {contract.symbol}")
+                return
+
+            # si el len es succesful , avanzamos
+            self._exchanges[exchange].strategies[b_index] = new_strategy
+
+
             # Activar estrategia
             for param in self._base_params:
                 code_name = param['code_name']
@@ -306,6 +318,9 @@ class StrategyEditor(tk.Frame):
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} started")
 
         else:
+
+            # Si paramos la estrategia dejamos de alimentar con datos el diccionario de la estrategia
+            del self._exchanges[exchange].strategies[b_index]
             # Desactivar estrategia
             for param in self._base_params:
                 code_name = param['code_name']

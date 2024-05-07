@@ -234,3 +234,7 @@
 2024-05-06 17:21:42,182 INFO :: Binance Websocket connection opened
 2024-05-06 17:21:42,224 INFO :: Bitmex Client succesfully initialized
 2024-05-06 17:21:43,712 INFO :: Bitmex Websocket connection opened
+2024-05-06 18:59:37,766 INFO :: Binance Futures Client succesfully initialized
+2024-05-06 18:59:39,064 INFO :: Binance Websocket connection opened
+2024-05-06 18:59:39,072 INFO :: Bitmex Client succesfully initialized
+2024-05-06 18:59:40,206 INFO :: Bitmex Websocket connection opened

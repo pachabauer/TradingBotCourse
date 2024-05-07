@@ -54,6 +54,15 @@ class Candle:
             self.close = candle_info['close']
             self.volume = candle_info['volume']
 
+        # Si no viene de los exchanges y viene del método para parsear candles que hemos creado.
+        elif exchange == "parse_trade":
+            self.timestamp = candle_info['ts']
+            self.open = candle_info['open']
+            self.high = candle_info['high']
+            self.low = candle_info['low']
+            self.close = candle_info['close']
+            self.volume = candle_info['volume']
+
 def tick_todecimals(tick_size: float) -> int:
     # Se usa para convertir el tick_size a string y a un máximo de 8 caracteres, sino mostrara la notación cientifica
     # ilegible tipo 1.43e-05 (como pasa en excel).

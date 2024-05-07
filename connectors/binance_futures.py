@@ -25,6 +25,8 @@ import json
 from models import *
 import typing
 
+from strategies import TechnicalStrategy, BreakoutStrategy
+
 logger = logging.getLogger()
 
 # hacemos una clase que contendrá varios métodos relacionados
@@ -54,6 +56,10 @@ class BinanceFuturesClient:
         self.balances = self.get_balances()
 
         self.prices = dict()
+
+        # Agrego variable para almacenar las candles de cada estrategia que inicie
+        # el Union significa que puede adoptar un valor u otro "Technical o Breakout"
+        self.strategies: typing.Dict[int, typing.Union[TechnicalStrategy, BreakoutStrategy]] = dict()
 
         self.logs = []
 
@@ -244,6 +250,11 @@ class BinanceFuturesClient:
         # Acá se suscribe al channel bookTicker
         self.subscribe_channel(list(self.contracts.values()), "bookTicker")
 
+        # Si esto da un error "invalid close opcode" Es porque Binance permite suscribir un máximo de 200 canales con
+        # una sola conexión.
+        # ver minuto 7.15 en adelante del video 41
+        self.subscribe_channel(list(self.contracts.values()), "aggTrade")
+
     def _on_close(self,ws):
         logger.warning("Binance Websocket connection closed")
 
@@ -265,6 +276,17 @@ class BinanceFuturesClient:
                 else:
                     self.prices[symbol]['bid'] = float(data['b'])
                     self.prices[symbol]['ask'] = float(data['a'])
+
+            elif data['e'] == "aggTrade":
+                symbol = data['s']
+
+                # Hago loop en la estrategia cada vez que recibo nueva información de precios de candles
+                # para ir viendo como afecta el nuevo precio a la estrategia (TP, SL , etc)
+                for key, strat in self.strategies.items():
+                    if strat.contract.symbol == symbol:
+                        # paso para parsear el trade: precio (p), quantity (q) y timestamp (T)
+                        strat.parse_trades(float(data['p']), float(data['q']), data['T'])
+
 
 
     # Para obtener data, necesito suscribirme a "canales". Esto es, una especie de endpoint, que envía datos
