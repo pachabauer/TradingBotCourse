@@ -91,9 +91,11 @@ class StrategyEditor(tk.Frame):
             # breakout, ya que en el curso solo muestran uno de cada uno, entonces no agrupan el indicador
             # con sus parámetros, sino que los mandan directo dentro de la lista.
             "Technical": [
+                {"code_name": "rsi_length", "name": "RSI Periods", "widget": tk.Entry, "data_type": int},
                 {"code_name": "ema_fast", "name": "MACD Fast Lenght", "widget": tk.Entry, "data_type": int},
                 {"code_name": "ema_slow", "name": "MACD Slow Lenght", "widget": tk.Entry, "data_type": int},
-                {"code_name": "ema_signal", "name": "MACD Signal Lenght", "widget": tk.Entry, "data_type": int}
+                {"code_name": "ema_signal", "name": "MACD Signal Lenght", "widget": tk.Entry, "data_type": int},
+
             ],
             "Breakout": [
                 {"code_name": "min_volume", "name": "Minimum Volume", "widget": tk.Entry, "data_type": float}
@@ -302,6 +304,8 @@ class StrategyEditor(tk.Frame):
             if len(new_strategy.candles) == 0:
                 self.root.logging_frame.add_log(f"No historical data retrieved for {contract.symbol}")
                 return
+
+            new_strategy._check_signal()
 
             # si el len es succesful , avanzamos
             self._exchanges[exchange].strategies[b_index] = new_strategy
