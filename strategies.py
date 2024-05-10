@@ -1,7 +1,19 @@
 import logging
+import time
+
 import pandas as pd
 from typing import *
 from models import *
+from threading import Timer
+
+# TYPE_CHECKING es una variable que inicializa en False y que evita un error de importación circular
+# Ya que en el modulo de strategy_component, que ya se usar en este módulo, ya importamos los connectores,
+# pero al querer usarlos aca debemos importarlos, entonces si lo hacemos de la forma habitual, arroja un error
+# circular. Pero poniendo el TYPE_CHECKING, evitamos este error, ya que al encontrarlos en otro módulo, los podremos
+# usar en este, pero sin importarlos acá mismo
+if TYPE_CHECKING:
+    from connectors.bitmex_futures import BitmexClient
+    from connectors.binance_futures import BinanceFuturesClient
 
 logger = logging.getLogger()
 
@@ -11,10 +23,14 @@ TF_EQUIV = {"1m": 60, "5m": 300, "15m": 900, "30m": 1800, "1h": 3600, "4h": 1440
 
 # Clase base de cualquier estrategia que tenga el TradingBot
 class Strategy():
-    def __init__(self, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
-                 stop_loss: float):
+    # Agrego el Union y las opciones van entre "" para poder usarlas, debido al TYPE_CHECKING
+    # Agrego el nombre de la estrategia como parámetro para pasarlo dentro del objeto nuevo creado en models Trade
+    # que pide guardar la estrategia en el nuevo trade
+    def __init__(self, client: Union["BitmexClient", "BinanceFuturesClient"], contract: Contract, exchange: str,
+                 timeframe: str, balance_pct: float, take_profit: float, stop_loss: float, strat_name):
 
         # Atributos comunes a cualquier estrategia del TradingBot
+        self.client = client
         self.contract = contract
         self.exchange = exchange
         self.tf = timeframe
@@ -23,11 +39,34 @@ class Strategy():
         self.take_profit = take_profit
         self.stop_loss = stop_loss
 
+        self.stat_name = strat_name
+
+        self.ongoing_position = False
+
         # Cada vez que creo una estrategia traigo las candles del contrato que voy a operar
         self.candles: List[Candle] = []
 
+        self.trades: List[Trade] = []
+
+        # agregare una lista de logs al logging_frame
+        self.logs = []
+
+    def _add_log(self, msg: str):
+        logger.info("%s", msg)
+        self.logs.append({"log": msg, "displayed": False})
+
+
     # creo un método para parsear la información del trade (precio, quantity, stop, etc)
     def parse_trades(self, price: float, size: float, timestamp: int) -> str:
+
+        # Creo el timestamp_diff y el if condicional para no empezar a pasar trades a lo loco y que todo el sistema
+        # de updates candles se ralentice y se haga imposible de operar por los delays. Le establezco al menos 2
+        # segundos entre trades.
+        timestamp_diff = int(time.time() * 1000) - timestamp
+        if timestamp_diff > 2000:
+            logger.warning("%s %s: %s miliseconds of difference between the current time and the trade time",
+                           self.exchange, self.contract.symbol, timestamp_diff)
+
         last_candle = self.candles[-1]
 
         # A su vez este método tendrá 3 posibilidades:
@@ -101,11 +140,73 @@ class Strategy():
 
             return "new_candle"
 
+    def _check_order_status(self, order_id):
+
+        order_status = self.client.get_order_status(self.contract, order_id)
+
+        if order_status is not None:
+            logger.info("%s order status: %s", self.exchange, order_status.status)
+
+            if order_status.status == "filled":
+                # loop sobre la lista de trades para identificar a este por el id
+                for trade in self.trades:
+                    if trade.entry_id == order_id:
+                        trade.entry_price = order_status.avg_price
+                        break
+                return
+
+        # chequeo hasta que el order_status este lleno cada 2 segundos
+        t = Timer(2.0, lambda: self._check_order_status(order_id))
+        t.start()
+
+
+
+    def _open_position(self, signal_result: int):
+
+        trade_size = self.client.get_trade_size(self.contract, self.candles[-1].close, self.balance_pct)
+        # Si es None, algo anduvo mal
+        if trade_size is None:
+            return
+
+        order_side = "buy" if signal_result == 1 else "sell"
+        # agregamos la posicion al log
+        position_side = "long" if signal_result == 1 else "short"
+        self._add_log(f"{position_side} signal on {self.contract.symbol} {self.tf}")
+
+        # pasamos la orden al cliente
+        order_status = self.client.place_order(self.contract, "MARKET", trade_size, order_side)
+
+        if order_status is not None:
+            # request succesful
+            self._add_log(f"{order_side.capitalize()} order placed on {self.exchange} | Status: {order_status.status}")
+            # muy importante: cambio el estado a True cuando se hace place de la orden
+            self.ongoing_position = True
+
+            avg_fill_price = None
+
+            # Binance y Bitmex devuelven filled cuando la orden está completa, pero otros exchanges pueden devolver
+            # otra palabra (executed, etc).
+            if order_status.status == "filled":
+                # guardo el precio promedio de ejecución de la orden
+                avg_fill_price = order_status.avg_price
+            else:
+                # puede pasar que la orden no se complete de una, sino que demore , entonces voy a ir chequeando
+                # cada x tiempo si se completó
+                t = Timer(2.0, lambda: self._check_order_status(order_status.order_id))
+                t.start()
+
+            # Va a ser una lista que guarde el Trade.
+            new_trade = Trade({"time": int(time.time() * 1000), "entry_price": avg_fill_price,
+                               "contract": self.contract, "strategy": self.stat_name, "side": position_side,
+                               "status": "open", "pnl": 0,"quantity": trade_size, "entry_id": order_status.order_id})
+
+            self.trades.append(new_trade)
+
 
 class TechnicalStrategy(Strategy):
-    def __init__(self, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
+    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
                  stop_loss: float, other_params: Dict):
-        super().__init__(contract, exchange, timeframe, balance_pct, take_profit, stop_loss)
+        super().__init__(client, contract, exchange, timeframe, balance_pct, take_profit, stop_loss, "Technical")
 
         # Atributos particulares de la clase
         self._ema_fast = other_params['ema_fast']
@@ -155,7 +256,6 @@ class TechnicalStrategy(Strategy):
 
         # convierto la lista a un Objeto Series de Pandas
         closes = pd.Series(close_list)
-        print(closes)
 
         # ewm provee los calculos para exponencial weighted functions. Lo calculo junto a un mean y sale la ema
         # podría usar una librería también, pero por ahora lo hacemos así
@@ -177,8 +277,6 @@ class TechnicalStrategy(Strategy):
         # llamo al método self._rsi() que devuelve 1 valor
         rsi = self._rsi()
 
-        print(rsi, macd_line, macd_signal)
-
         if rsi < 30 and macd_line > macd_signal:
             return 1
         elif rsi > 70 and macd_line < macd_signal:
@@ -186,11 +284,24 @@ class TechnicalStrategy(Strategy):
         else:
             return 0
 
+    # En technical, sólo chequeamos el trade cuando hay un nuevo candle
+    def check_trade(self, tick_type: str):
+
+        # Si viene un nuevo candle y ongoing_position es False (es decir que no hay nada ya abierto)
+        if tick_type == "new_candle" and not self.ongoing_position:
+            signal_result = self._check_signal()
+
+            # -1 se refiere a short y 1 a long, es decir si el signal_result ya dio para hacer un short o long
+            if signal_result in [-1, 1]:
+                # abro la posición
+                self._open_position(signal_result)
+
+
 
 class BreakoutStrategy(Strategy):
-    def __init__(self, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
+    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
                  stop_loss: float, other_params: Dict):
-        super().__init__(contract, exchange, timeframe, balance_pct, take_profit, stop_loss)
+        super().__init__(client, contract, exchange, timeframe, balance_pct, take_profit, stop_loss, "Breakout")
 
         # Atributos particulares de la clase
         self.min_volume = other_params['min_volume']
@@ -208,3 +319,14 @@ class BreakoutStrategy(Strategy):
             return -1
         else:
             return 0
+
+    def check_trade(self, tick_type: str):
+
+        # no hay, como en Technical, una restricción de un new_candle, sólo ongoing_position debe ser False
+        if not self.ongoing_position:
+            signal_result = self._check_signal()
+
+            # -1 se refiere a short y 1 a long, es decir si el signal_result ya dio para hacer un short o long
+            if signal_result in [-1, 1]:
+                # abro la posición
+                self._open_position(signal_result)

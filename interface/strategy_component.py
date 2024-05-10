@@ -7,6 +7,7 @@ from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
 
+
 class StrategyEditor(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
     # de ellos y no sea posible agregar o escribir cualquier cosa.
@@ -33,8 +34,6 @@ class StrategyEditor(tk.Frame):
             # para iterar por cada contrato que aparezca del client
             for symbol, contract in client.contracts.items():
                 self._all_contracts.append(symbol + "_" + exchange.capitalize())
-
-
 
         # Se crean dos marcos (Frame) para los controles de la interfaz y la tabla de visualización.
         self._commands_frame = tk.Frame(self, bg=BG_COLOR)
@@ -92,9 +91,9 @@ class StrategyEditor(tk.Frame):
             # con sus parámetros, sino que los mandan directo dentro de la lista.
             "Technical": [
                 {"code_name": "rsi_length", "name": "RSI Periods", "widget": tk.Entry, "data_type": int},
-                {"code_name": "ema_fast", "name": "MACD Fast Lenght", "widget": tk.Entry, "data_type": int},
-                {"code_name": "ema_slow", "name": "MACD Slow Lenght", "widget": tk.Entry, "data_type": int},
-                {"code_name": "ema_signal", "name": "MACD Signal Lenght", "widget": tk.Entry, "data_type": int},
+                {"code_name": "ema_fast", "name": "MACD Fast Length", "widget": tk.Entry, "data_type": int},
+                {"code_name": "ema_slow", "name": "MACD Slow Length", "widget": tk.Entry, "data_type": int},
+                {"code_name": "ema_signal", "name": "MACD Signal Length", "widget": tk.Entry, "data_type": int},
 
             ],
             "Breakout": [
@@ -108,7 +107,7 @@ class StrategyEditor(tk.Frame):
         # Se crean etiquetas de encabezado y se colocan en la primera fila de la tabla.
         for idx, h in enumerate(self._headers):
             # uso el inline if para decir si tiene datos, mostrá el remove, sino ""
-            header = tk.Label(self._table_frame, text=h, bg=BG_COLOR, fg=FG_COLOR,font=BOLD_FONT)
+            header = tk.Label(self._table_frame, text=h, bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
             header.grid(row=0, column=idx)
 
         # itero para completar dinámicamente las etiquetas del widget
@@ -117,7 +116,6 @@ class StrategyEditor(tk.Frame):
             self.body_widgets[h['code_name']] = dict()
             if h['code_name'] in ["strategy_type", "contract", "timeframe"]:
                 self.body_widgets[h['code_name'] + "_var"] = dict()
-
 
         # una variable int que se posiciona en la última fila de la tabla y se irá incrementando a medida
         # que se agregue filas (datos) de ["symbol", "exchange", "bid", "ask"]
@@ -139,7 +137,7 @@ class StrategyEditor(tk.Frame):
                 self.body_widgets[code_name][b_index] = tk.OptionMenu(self._table_frame,
                                                                       self.body_widgets[code_name + "_var"][b_index],
                                                                       *base_param['values'])
-                self.body_widgets[code_name][b_index].config(width= base_param['width'])
+                self.body_widgets[code_name][b_index].config(width=base_param['width'])
 
             elif base_param['widget'] == tk.Entry:
                 self.body_widgets[code_name][b_index] = tk.Entry(self._table_frame, justify=tk.CENTER)
@@ -149,14 +147,14 @@ class StrategyEditor(tk.Frame):
                 # ese valor disparado por el callback en una variable frozen para que no cambie cada vez
                 # que iteramos sobre ese método y quede fijada.
                 self.body_widgets[code_name][b_index] = tk.Button(self._table_frame, text=base_param['text'],
-                                                                  bg=base_param['bg'], fg= FG_COLOR,
-                                                                  command=lambda frozen_command =
+                                                                  bg=base_param['bg'], fg=FG_COLOR,
+                                                                  command=lambda frozen_command=
                                                                                  base_param['command']:
-                                                                                 frozen_command(b_index))
+                                                                  frozen_command(b_index))
             else:
                 continue
 
-            self.body_widgets[code_name][b_index].grid(row=b_index, column= col)
+            self.body_widgets[code_name][b_index].grid(row=b_index, column=col)
 
         # Lo uso para crear parametros adicionales necesarios para determinada estrategia
         self._additional_parameters[b_index] = dict()
@@ -166,7 +164,6 @@ class StrategyEditor(tk.Frame):
             # Itera sobre los diccionarios dentro de Technical y Breakout
             for param in params:
                 self._additional_parameters[b_index][param['code_name']] = None
-
 
         self._body_index += 1
 
@@ -205,13 +202,14 @@ class StrategyEditor(tk.Frame):
             # itero los parámetros a través de la etiqueta
             code_name = param['code_name']
             temp_label = tk.Label(self._popup_window, bg=BG_COLOR, fg=FG_COLOR, text=param['name'], font=BOLD_FONT)
-            temp_label.grid(row = row_nb, column=0)
+            temp_label.grid(row=row_nb, column=0)
 
             if param['widget'] == tk.Entry:
-                self._extra_input[code_name] = tk.Entry(self._popup_window, bg=BG_COLOR2, justify=tk.CENTER, fg=FG_COLOR,
-                                      insertbackground=FG_COLOR)
+                self._extra_input[code_name] = tk.Entry(self._popup_window, bg=BG_COLOR2, justify=tk.CENTER,
+                                                        fg=FG_COLOR,
+                                                        insertbackground=FG_COLOR)
 
-                if self._additional_parameters[b_index][code_name] is not None :
+                if self._additional_parameters[b_index][code_name] is not None:
                     self._extra_input[code_name].insert(tk.END, str(self._additional_parameters[b_index][code_name]))
 
             else:
@@ -230,7 +228,6 @@ class StrategyEditor(tk.Frame):
         # (queda centrado así)
         validation_button.grid(row=row_nb, column=0, columnspan=2)
 
-
     def _validate_parameters(self, b_index: int):
 
         # Identifico la estrategia utilizada para crear los inputs de los parameters dinámicamente (en base a la
@@ -242,13 +239,11 @@ class StrategyEditor(tk.Frame):
 
             if self._extra_input[code_name].get() == "":
                 self._additional_parameters[b_index][code_name] = None
-            else :
+            else:
                 self._additional_parameters[b_index][code_name] = param['data_type'](self._extra_input[code_name].get())
 
         # cuando presionamos el botón de validate del popup de parámetros, se borra la ventana de popup
         self._popup_window.destroy()
-
-
 
     # Tendrá 2 funcionalidades:
     # Una para activar o desactivar la estrategia
@@ -272,14 +267,21 @@ class StrategyEditor(tk.Frame):
                 self.root.logging_frame.add_log(f"Missing {param['code_name']} parameter")
                 return
 
+        # Obtener balance actual de USDT en Binance Futures
+        binance_balance = self._exchanges["Binance"].get_balances()
+        usdt_balance = binance_balance.get('USDT', None)
+        if usdt_balance is not None:
+            self.root.logging_frame.add_log(
+                f"Binance Futures current USDT balance: {usdt_balance.wallet_balance:.2f}")
+        else:
+            self.root.logging_frame.add_log("Unable to retrieve Binance Futures USDT balance.")
+
         # Si están completados todos los parámetros requeridos, avanzo y los guardo
         # Por ejemplo el symbol BTCUSDT_BINANCE , la primer parte [0] es el contrato y la segunda el exchange
         symbol = self.body_widgets['contract_var'][b_index].get().split("_")[0]
         exchange = self.body_widgets['contract_var'][b_index].get().split("_")[1]
-
-        contract = self._exchanges[exchange].contracts[symbol]
-
         timeframe = self.body_widgets['timeframe_var'][b_index].get()
+        contract = self._exchanges[exchange].contracts[symbol]
         balance_pct = float(self.body_widgets['balance_pct'][b_index].get())
         take_profit = float(self.body_widgets['take_profit'][b_index].get())
         stop_loss = float(self.body_widgets['stop_loss'][b_index].get())
@@ -289,11 +291,13 @@ class StrategyEditor(tk.Frame):
 
             # Agrego una validación de que estrategia elijo para crear una clase y usar sus métodos
             if strat_selected == "Technical":
-                new_strategy = TechnicalStrategy(contract, exchange, timeframe, balance_pct, take_profit, stop_loss,
-                                                 self._additional_parameters[b_index])
+                # agrego el exchange, ya que cada vez que efectue una nueva estrategia, el tamaño del trade
+                # será distinto dependiendo del exchange (la forma de calcularlo)
+                new_strategy = TechnicalStrategy(self._exchanges[exchange], contract, exchange, timeframe, balance_pct,
+                                                 take_profit, stop_loss, self._additional_parameters[b_index])
             elif strat_selected == "Breakout":
-                new_strategy = BreakoutStrategy(contract, exchange, timeframe, balance_pct, take_profit, stop_loss,
-                                                 self._additional_parameters[b_index])
+                new_strategy = BreakoutStrategy(self._exchanges[exchange], contract, exchange, timeframe, balance_pct,
+                                                take_profit, stop_loss, self._additional_parameters[b_index])
             else:
                 return
 
@@ -310,15 +314,14 @@ class StrategyEditor(tk.Frame):
             # si el len es succesful , avanzamos
             self._exchanges[exchange].strategies[b_index] = new_strategy
 
-
             # Activar estrategia
             for param in self._base_params:
                 code_name = param['code_name']
                 if code_name != "activation" and "_var" not in code_name:
-                    self.body_widgets[code_name][b_index].config(state= tk.DISABLED)
+                    self.body_widgets[code_name][b_index].config(state=tk.DISABLED)
 
             # cambio el color y valor del botón clickeado (ya que quedó disabled)
-            self.body_widgets["activation"][b_index].config(bg= "darkgreen", text= "ON")
+            self.body_widgets["activation"][b_index].config(bg="darkgreen", text="ON")
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} started")
 
         else:
@@ -329,12 +332,11 @@ class StrategyEditor(tk.Frame):
             for param in self._base_params:
                 code_name = param['code_name']
                 if code_name != "activation" and "_var" not in code_name:
-                    self.body_widgets[code_name][b_index].config(state= tk.NORMAL)
+                    self.body_widgets[code_name][b_index].config(state=tk.NORMAL)
 
             # cambio el color y valor del botón clickeado (ya que quedó disabled)
-            self.body_widgets["activation"][b_index].config(bg= "darkred", text= "OFF")
+            self.body_widgets["activation"][b_index].config(bg="darkred", text="OFF")
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} stopped")
-
 
         return
 

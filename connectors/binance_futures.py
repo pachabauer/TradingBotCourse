@@ -29,6 +29,7 @@ from strategies import TechnicalStrategy, BreakoutStrategy
 
 logger = logging.getLogger()
 
+
 # hacemos una clase que contendrá varios métodos relacionados
 class BinanceFuturesClient:
 
@@ -44,7 +45,6 @@ class BinanceFuturesClient:
         else:
             self._base_url = "https://fapi.binance.com"
             self._wss_url = "wss://fstream.binance.com/ws"
-
 
         self._public_key = public_key
         self._secret_key = secret_key
@@ -73,7 +73,7 @@ class BinanceFuturesClient:
 
     def _add_log(self, msg: str):
         logger.info("%s", msg)
-        self.logs.append({"log":msg, "displayed":False})
+        self.logs.append({"log": msg, "displayed": False})
 
     # typing es una librería que nos permite asignar un dato como Objeto. Como Integer en java (en vez de int)
     # el _ delante del método, lo indica como privado de la clase. No lo puedo usar de cualquier instancia
@@ -106,7 +106,7 @@ class BinanceFuturesClient:
             raise ValueError()
 
         if response.status_code == 200:
-            return  response.json()
+            return response.json()
         else:
             # los %s son variables method y endpoint, response (los 2)
             logger.error("Error while making %s request to %s: %s (error code %s)",
@@ -177,17 +177,17 @@ class BinanceFuturesClient:
 
         return balances
 
-    def place_order(self, contract: Contract, side: str, quantity: float, order_type: str,
+    def place_order(self, contract: Contract, order_type: str, quantity: float, side: str,
                     price=None, tif=None) -> OrderStatus:
         data = dict()
         data['symbol'] = contract.symbol
-        data['side'] = side
+        data['side'] = side.upper()
         data['quantity'] = round(round(quantity / contract.lot_size) * contract.lot_size, 8)
         data['type'] = order_type
 
         # Son los argumentos no mandatorios, es decir no obligatorios
         if price is not None:
-            data['price'] = round(round(price / contract.tick_size) * contract.tick_size,8)
+            data['price'] = round(round(price / contract.tick_size) * contract.tick_size, 8)
         if tif is not None:
             data['timeInForce'] = tif
 
@@ -234,7 +234,7 @@ class BinanceFuturesClient:
 
         # lleva como argumentos: url y callback functions
         self._ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close,
-                                    on_error=self._on_error, on_message=self._on_message)
+                                          on_error=self._on_error, on_message=self._on_message)
 
         # inicia el loop infinito esperando mensajes del websocket server
         # Si llega a dar error o se cae la conexión, espera 2 segundos para reconectarse automaticamente
@@ -245,7 +245,7 @@ class BinanceFuturesClient:
                 logger.error("Binance error in run_forever() method: %s", e)
             time.sleep(2)
 
-    def _on_open(self,ws):
+    def _on_open(self, ws):
         logger.info("Binance Websocket connection opened")
         # Acá se suscribe al channel bookTicker
         self.subscribe_channel(list(self.contracts.values()), "bookTicker")
@@ -255,14 +255,13 @@ class BinanceFuturesClient:
         # ver minuto 7.15 en adelante del video 41
         self.subscribe_channel(list(self.contracts.values()), "aggTrade")
 
-    def _on_close(self,ws):
+    def _on_close(self, ws):
         logger.warning("Binance Websocket connection closed")
 
     def _on_error(self, ws, msg: str):
         logger.error("Binance Websocket connection error: %s", msg)
 
     def _on_message(self, ws, msg: str):
-
         # Una vez recibidos los datos del ws, convierto el jsonString a jsonObject, a fin de mostrarlo claramente
         data = json.loads(msg)
 
@@ -277,7 +276,7 @@ class BinanceFuturesClient:
                     self.prices[symbol]['bid'] = float(data['b'])
                     self.prices[symbol]['ask'] = float(data['a'])
 
-            elif data['e'] == "aggTrade":
+            if data['e'] == "aggTrade":
                 symbol = data['s']
 
                 # Hago loop en la estrategia cada vez que recibo nueva información de precios de candles
@@ -285,20 +284,20 @@ class BinanceFuturesClient:
                 for key, strat in self.strategies.items():
                     if strat.contract.symbol == symbol:
                         # paso para parsear el trade: precio (p), quantity (q) y timestamp (T)
-                        strat.parse_trades(float(data['p']), float(data['q']), data['T'])
-
-
+                        # lo guardo en una variable result. Ese result es para update la candle o crear una nueva
+                        res = strat.parse_trades(float(data['p']), float(data['q']), data['T'])
+                        strat.check_trade(res)
 
     # Para obtener data, necesito suscribirme a "canales". Esto es, una especie de endpoint, que envía datos
     # los cuales son recibidos por el ws y transmitidos al programa
     # https://binance-docs.github.io/apidocs/testnet/en/#live-subscribing-unsubscribing-to-streams
-    def subscribe_channel(self, contracts:typing.List[Contract], channel: str):
+    def subscribe_channel(self, contracts: typing.List[Contract], channel: str):
         data = dict()
         data['method'] = "SUBSCRIBE"
         data['params'] = []
 
         for contract in contracts:
-        # ver documentación : ticker en minusculas mas el @ y el bookTicker
+            # ver documentación : ticker en minusculas mas el @ y el bookTicker
             data['params'].append(contract.symbol.lower() + "@" + channel)
         data['id'] = self._ws_id
 
@@ -312,3 +311,29 @@ class BinanceFuturesClient:
             logger.error("Websocket error while subscribing to %s %s updates: %s", len(contracts), channel, e)
 
         self._ws_id += 1
+
+    # Determino el tamaño del trade en base a lo establecido en la UI (el número que paso)
+    # Necesito pasar como parámetro el contract para determinar a través del redondeo (round) la cant que voy a
+    # entrar como posición.
+    def get_trade_size(self, contract: Contract, price: float, balance_pct: float):
+
+        # averiguamos si el balance está updateado.
+        balance = self.get_balances()
+        if balance is not None:
+            # Definimos que usaremos USDT para operar. OJO con esto porque si usamos otro stable o crypto no
+            # funcionará el trade, ya que no lo estamos definiendo como moneda de margen.
+            if 'USDT' in balance:
+                balance = balance['USDT'].wallet_balance
+            else:
+                return None
+        else:
+            return None
+
+        # monto de USDT a invertir
+        trade_size = (balance * balance_pct / 100) / price
+        # cantidad de USDT a usar redondeados a 8 decimales máximo.
+        trade_size = round(round(trade_size / contract.lot_size) * contract.lot_size, 8)
+        # loggeo la información
+        logger.info("Binance Futures current USDT balance = %s, trade_size = %s", balance, trade_size)
+
+        return trade_size

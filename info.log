@@ -258,3 +258,105 @@
 2024-05-07 18:49:13,004 INFO :: Bitmex Client succesfully initialized
 2024-05-07 18:49:13,468 INFO :: Binance Websocket connection opened
 2024-05-07 18:49:14,144 INFO :: Bitmex Websocket connection opened
+2024-05-09 13:33:13,774 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 13:33:14,907 INFO :: Bitmex Client succesfully initialized
+2024-05-09 13:33:15,335 INFO :: Binance Websocket connection opened
+2024-05-09 13:33:16,448 INFO :: Bitmex Websocket connection opened
+2024-05-09 13:35:47,058 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 13:35:48,346 INFO :: Binance Websocket connection opened
+2024-05-09 13:35:49,725 INFO :: Bitmex Client succesfully initialized
+2024-05-09 13:35:50,790 INFO :: Bitmex Websocket connection opened
+2024-05-09 16:58:53,426 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 16:58:54,697 INFO :: Binance Websocket connection opened
+2024-05-09 16:58:54,771 INFO :: Bitmex Client succesfully initialized
+2024-05-09 16:58:56,150 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:00:45,876 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:00:46,911 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:00:47,193 INFO :: Binance Websocket connection opened
+2024-05-09 17:00:47,984 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:43:48,302 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:43:49,604 INFO :: Binance Websocket connection opened
+2024-05-09 17:43:49,732 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:43:50,803 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:53:36,337 ERROR :: Error while making GET request to /fapi/v2/account: {'code': -1021, 'msg': "Timestamp for this request was 1000ms ahead of the server's time."} (error code 400)
+2024-05-09 17:53:36,339 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:53:37,310 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:53:37,682 INFO :: Binance Websocket connection opened
+2024-05-09 17:53:38,358 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:54:58,803 ERROR :: Error while making GET request to /fapi/v2/account: {'code': -1021, 'msg': "Timestamp for this request was 1000ms ahead of the server's time."} (error code 400)
+2024-05-09 17:54:58,805 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:54:59,766 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:55:00,135 INFO :: Binance Websocket connection opened
+2024-05-09 17:55:00,811 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:56:19,919 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:56:20,888 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:56:21,169 INFO :: Binance Websocket connection opened
+2024-05-09 17:56:21,934 INFO :: Bitmex Websocket connection opened
+2024-05-09 17:57:27,997 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:57:29,307 INFO :: Binance Websocket connection opened
+2024-05-09 17:57:40,295 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 17:57:41,146 INFO :: Bitmex Client succesfully initialized
+2024-05-09 17:57:41,566 INFO :: Binance Websocket connection opened
+2024-05-09 17:57:42,217 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:02:13,388 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:02:14,183 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:02:14,676 INFO :: Binance Websocket connection opened
+2024-05-09 18:02:15,177 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:04:32,788 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:04:33,510 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:04:34,049 INFO :: Binance Websocket connection opened
+2024-05-09 18:04:34,575 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:21:50,323 ERROR :: Error while making GET request to /fapi/v2/account: {'code': -1021, 'msg': "Timestamp for this request was 1000ms ahead of the server's time."} (error code 400)
+2024-05-09 18:21:50,325 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:21:51,192 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:21:51,591 INFO :: Binance Websocket connection opened
+2024-05-09 18:21:52,250 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:30:16,746 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:30:17,564 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:30:18,026 INFO :: Binance Websocket connection opened
+2024-05-09 18:30:18,619 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:37:43,392 ERROR :: Error while making GET request to /fapi/v2/exchangeInfo: {'code': -1102, 'msg': "Mandatory parameter 'timestamp' was not sent, was empty/null, or malformed."} (error code 400)
+2024-05-09 18:37:43,774 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:37:45,097 INFO :: Binance Websocket connection opened
+2024-05-09 18:37:45,258 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:37:45,449 WARNING :: Binance Websocket connection closed
+2024-05-09 18:37:46,336 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:37:48,720 INFO :: Binance Websocket connection opened
+2024-05-09 18:37:49,045 WARNING :: Binance Websocket connection closed
+2024-05-09 18:37:52,330 INFO :: Binance Websocket connection opened
+2024-05-09 18:37:52,695 WARNING :: Binance Websocket connection closed
+2024-05-09 18:37:56,016 INFO :: Binance Websocket connection opened
+2024-05-09 18:37:56,400 WARNING :: Binance Websocket connection closed
+2024-05-09 18:37:59,719 INFO :: Binance Websocket connection opened
+2024-05-09 18:38:00,066 WARNING :: Binance Websocket connection closed
+2024-05-09 18:38:03,315 INFO :: Binance Websocket connection opened
+2024-05-09 18:38:03,660 WARNING :: Binance Websocket connection closed
+2024-05-09 18:38:06,917 INFO :: Binance Websocket connection opened
+2024-05-09 18:38:07,265 WARNING :: Binance Websocket connection closed
+2024-05-09 18:39:02,544 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:39:03,338 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:39:03,859 INFO :: Binance Websocket connection opened
+2024-05-09 18:39:04,411 INFO :: Bitmex Websocket connection opened
+2024-05-09 18:40:24,074 INFO :: Binance Futures Client succesfully initialized
+2024-05-09 18:40:24,837 INFO :: Bitmex Client succesfully initialized
+2024-05-09 18:40:25,315 INFO :: Binance Websocket connection opened
+2024-05-09 18:40:25,891 INFO :: Bitmex Websocket connection opened
+2024-05-10 10:20:53,631 INFO :: Binance Futures Client succesfully initialized
+2024-05-10 10:20:54,672 INFO :: Bitmex Client succesfully initialized
+2024-05-10 10:20:54,917 INFO :: Binance Websocket connection opened
+2024-05-10 10:20:55,935 INFO :: Bitmex Websocket connection opened
+2024-05-10 10:21:42,595 INFO :: Binance Futures Client succesfully initialized
+2024-05-10 10:21:43,682 INFO :: Bitmex Client succesfully initialized
+2024-05-10 10:21:43,859 INFO :: Binance Websocket connection opened
+2024-05-10 10:21:44,718 INFO :: Bitmex Websocket connection opened
+2024-05-10 10:27:17,421 ERROR :: Error while making GET request to /fapi/v1/account: {'code': -5000, 'msg': 'GET /fapi/v1/account is retired, please use GET /fapi/v2/account'} (error code 400)
+2024-05-10 10:27:17,423 INFO :: Binance Futures Client succesfully initialized
+2024-05-10 10:27:18,509 INFO :: Bitmex Client succesfully initialized
+2024-05-10 10:27:18,701 INFO :: Binance Websocket connection opened
+2024-05-10 10:27:19,573 INFO :: Bitmex Websocket connection opened
+2024-05-10 11:27:34,120 INFO :: Binance Futures Client succesfully initialized
+2024-05-10 11:27:35,398 INFO :: Binance Websocket connection opened
+2024-05-10 11:27:35,512 INFO :: Bitmex Client succesfully initialized
+2024-05-10 11:27:36,531 INFO :: Bitmex Websocket connection opened
+2024-05-10 11:41:10,115 WARNING :: Binance Websocket connection closed
+2024-05-10 11:41:13,407 INFO :: Binance Websocket connection opened

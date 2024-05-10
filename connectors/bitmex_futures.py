@@ -199,7 +199,7 @@ class BitmexClient:
     # Este método, a diferencia de Binance, no trae al principio el order_id directamente, sino que trae una lista de
     # diccionarios. En esa lista debemos buscar nuestro order_id (de nuestra orden pasada previamente) y una vez
     # encontrado, devolverá el estado.
-    def get_order_status(self, order_id: str, contract: Contract) -> OrderStatus:
+    def get_order_status(self, contract: Contract, order_id: str) -> OrderStatus:
 
         data = dict()
         data['symbol'] = contract.symbol
@@ -278,7 +278,9 @@ class BitmexClient:
                     for key, strat in self.strategies.items():
                         if strat.contract.symbol == symbol:
                             # paso para parsear el trade: precio (p), quantity (q) y timestamp (T)
-                            strat.parse_trades(float(d['price']), float(d['size']), ts)
+                            # lo guardo en una variable result. Ese result es para update la candle o crear una nueva
+                            res = strat.parse_trades(float(d['price']), float(d['size']), ts)
+                            strat.check_trade(res)
 
 
     def subscribe_channel(self, topic: str):
@@ -295,3 +297,38 @@ class BitmexClient:
             self._ws.send(json.dumps(data))
         except Exception as e:
             logger.error("Websocket error while subscribing to %s %s", topic, e)
+
+
+    # Determino el tamaño del trade en base a lo establecido en la UI (el número que paso)
+    # Necesito pasar como parámetro el contract para determinar a través del redondeo (round) la cant que voy a
+    # entrar como posición.
+    def get_trade_size(self, contract: Contract, price: float, balance_pct: float):
+
+        # averiguamos si el balance está updateado.
+        balance = self.get_balances()
+        if balance is not None:
+            # Definimos que usaremos XBt para operar. OJO con esto porque si usamos otro stable o crypto no
+            # funcionará el trade, ya que no lo estamos definiendo como moneda de margen.
+            if 'XBt' in balance:
+                balance = balance['XBt'].wallet_balance
+            else:
+                return None
+        else:
+            return None
+
+        xbt_size = balance * balance_pct / 100
+
+        # https://www.bitmex.com/app/quantoPerpetualsGuide
+        # https: // www.bitmex.com / app / inversePerpetualsGuide
+        # guías útiles fundamentales para entender como funcional los contratos inverse y quanto de Bitmex
+        if contract.inverse:
+            contracts_number = xbt_size / (contract.multiplier / price)
+        elif contract.quanto:
+            contracts_number = xbt_size / (contract.multiplier * price)
+        else:
+            contracts_number = xbt_size / (contract.multiplier * price)
+
+        logger.info("Bitmex current XBT Balance = %s, contracts_number = %s", balance, contracts_number)
+
+        return int(contracts_number)
+

@@ -95,8 +95,8 @@ class Contract:
             # Estos últimos 2 se usan para redondear precio y cantidad de una orden a un decimal aceptado por Binance
             self.price_decimals = contract_info['pricePrecision']
             self.quantity_decimals = contract_info['quantityPrecision']
-            self.tick_size = 1 / pow(10,contract_info['pricePrecision'])
-            self.lot_size = 1 / pow(10,contract_info['quantityPrecision'])
+            self.tick_size = 1 / pow(10, contract_info['pricePrecision'])
+            self.lot_size = 1 / pow(10, contract_info['quantityPrecision'])
 
         elif exchange == "bitmex":
             self.symbol = contract_info['symbol']
@@ -108,19 +108,53 @@ class Contract:
             self.tick_size = contract_info['tickSize']
             self.lot_size = contract_info['lotSize']
 
+            # BitMEX offers Quanto Perpetual Contracts in US Dollars and Tether. This allows exposure to the US Dollar
+            # or Tether price of an asset, without needing to hold US Dollars / Tether or the asset directly.
+            # https://www.bitmex.com/app/quantoPerpetualsGuide
+            self.quanto = contract_info['isQuanto']
+
+            # BitMEX offers an Inverse Perpetual Contract on Bitcoin and other cryptocurrencies against USD.
+            # The XBTUSD Perpetual Contract allows traders to get exposure to the future value
+            # of the Bitcoin / USD (XBT/USD) exchange rate.
+            # https://www.bitmex.com/app/inversePerpetualsGuide
+            # Siempre vienen con signo negativo, así que deberé multiplicar por -1
+            self.inverse = contract_info['isInverse']
+
+            # como el contrato está en satoshis, debo multiplicar por la constante MULTIPLICADOR
+            self.multiplier = contract_info['multiplier'] * BITMEX_MULTIPLIER
+
+            if self.inverse:
+                self.multiplier *= -1
+
 
 class Contract_Bitmex:
     def __init__(self, contract_info):
         self.symbol = contract_info['symbol']
         self.root_symbol = contract_info['rootSymbol']
 
+
 class OrderStatus:
     def __init__(self, order_info, exchange):
         if exchange == "binance":
             self.order_id = order_info['orderId']
-            self.status = order_info['status']
+            self.status = order_info['status'].lower()
             self.avg_price = float(order_info['avgPrice'])
         elif exchange == "bitmex":
             self.order_id = order_info['orderID']
-            self.status = order_info['ordStatus']
+            self.status = order_info['ordStatus'].lower()
             self.avg_price = order_info['avgPx']
+
+
+# Creamos una clase Trade para usarla dentro de strategies
+class Trade:
+    def __init__(self, trade_info):
+        self.time: int = trade_info['time']
+        self.contract: Contract = trade_info['contract']
+        self.strategy: str = trade_info['strategy']
+        self.side: str = trade_info['side']
+        self.entry_price: float = trade_info['entry_price']
+        self.status: str = trade_info['status']
+        self.pnl: float = trade_info['pnl']
+        self.quantity = trade_info['quantity']
+        self.entry_id = trade_info['entry_id']
+
