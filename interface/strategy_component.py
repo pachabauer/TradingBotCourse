@@ -267,15 +267,6 @@ class StrategyEditor(tk.Frame):
                 self.root.logging_frame.add_log(f"Missing {param['code_name']} parameter")
                 return
 
-        # Obtener balance actual de USDT en Binance Futures
-        binance_balance = self._exchanges["Binance"].get_balances()
-        usdt_balance = binance_balance.get('USDT', None)
-        if usdt_balance is not None:
-            self.root.logging_frame.add_log(
-                f"Binance Futures current USDT balance: {usdt_balance.wallet_balance:.2f}")
-        else:
-            self.root.logging_frame.add_log("Unable to retrieve Binance Futures USDT balance.")
-
         # Si están completados todos los parámetros requeridos, avanzo y los guardo
         # Por ejemplo el symbol BTCUSDT_BINANCE , la primer parte [0] es el contrato y la segunda el exchange
         symbol = self.body_widgets['contract_var'][b_index].get().split("_")[0]

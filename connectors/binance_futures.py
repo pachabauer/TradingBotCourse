@@ -121,8 +121,14 @@ class BinanceFuturesClient:
 
         if exchange_info is not None:
             for contract_data in exchange_info['symbols']:
-                # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
-                contracts[contract_data['symbol']] = Contract(contract_data, "binance")
+                # Aca lo hardcodeo a solo esos 4 contratos, ya que si paso toda la lista, estoy suscribiendo mas
+                # de los 200 que permite mandar binance por stream. Por ejemplo: btcusdt@bookTicker, btcusdt@aggTrade
+                # Ahí ya tengo 2. Si tengo más de 100 contratos (hay 306) estaría pasando muchos más de 200
+                # por ende, solo traerá los primeros 200 contratos (solo con bookticker) nunca llegará a
+                # aggTrade y el programa fallará.
+                if contract_data['symbol'] in ['BTCUSDT', 'ETHUSDT','BNBUSDT', 'SOLUSDT']:
+                    # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
+                    contracts[contract_data['symbol']] = Contract(contract_data, "binance")
 
         return contracts
 
@@ -248,9 +254,11 @@ class BinanceFuturesClient:
     def _on_open(self, ws):
         logger.info("Binance Websocket connection opened")
         # Acá se suscribe al channel bookTicker
+        # Las suscripciones a canales deberían hacerse a "demanda" de cuando doy de alta una estrategia,
+        # le suscribo el contrato que doy de alta.
         self.subscribe_channel(list(self.contracts.values()), "bookTicker")
 
-        # Si esto da un error "invalid close opcode" Es porque Binance permite suscribir un máximo de 200 canales con
+        # Si esto da un error "invalid close opcode" Es porque Binance permite suscribir un máximo de 200 contratos con
         # una sola conexión.
         # ver minuto 7.15 en adelante del video 41
         self.subscribe_channel(list(self.contracts.values()), "aggTrade")
