@@ -98,7 +98,7 @@ class StrategyEditor(tk.Frame):
             ],
             "Breakout": [
                 {"code_name": "min_volume", "name": "Minimum Volume", "widget": tk.Entry, "data_type": float}
-            ],
+            ]
         }
 
         # la función enumerate nos permite acceder al mismo tiempo al valor del elemento de la lista (h)
@@ -300,7 +300,9 @@ class StrategyEditor(tk.Frame):
                 self.root.logging_frame.add_log(f"No historical data retrieved for {contract.symbol}")
                 return
 
-            new_strategy._check_signal()
+            if exchange == "Binance":
+                self._exchanges[exchange].subscribe_channel([contract], "bookTicker")
+                self._exchanges[exchange].subscribe_channel([contract], "aggTrade")
 
             # si el len es succesful , avanzamos
             self._exchanges[exchange].strategies[b_index] = new_strategy

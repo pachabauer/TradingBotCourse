@@ -44,7 +44,6 @@ class Candle:
             # convierto el string ISO 8601 que trae Bitmex a un datetime object
             self.timestamp = dateutil.parser.isoparse(candle_info['timestamp'])
             self.timestamp = self.timestamp - datetime.timedelta(minutes=BITMEX_TF_MINUTES[timeframe])
-            print(self.timestamp)
             # ahora convierto el datetime object a timestamp (ahora queda igual al de binance cuando lo convierto
             # a un entero y lo multiplico por 1000)
             self.timestamp = int(self.timestamp.timestamp() * 1000)
@@ -125,6 +124,9 @@ class Contract:
 
             if self.inverse:
                 self.multiplier *= -1
+
+        # Agrego el exchange pora poder usarlo en Trades en el trades_component
+        self.exchange = exchange
 
 
 class Contract_Bitmex:

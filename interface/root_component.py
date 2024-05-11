@@ -70,6 +70,36 @@ class Root(tk.Tk):
                 self.logging_frame.add_log(log['log'])
                 log['displayed'] = True
 
+        # Trades and logs
+        # Itero para agregar los logs a la interface de los trades que voy abriendo posición.
+        for client in [self.binance, self.bitmex]:
+            try:
+                for b_index, strat in client.strategies.items():
+                    for log in strat.logs:
+                        if not log['displayed']:
+                            self.logging_frame.add_log(log['log'])
+                            log['displayed'] = True
+
+                    # agrego al trade a la interface si está en strat.trades
+                    for trade in strat.trades:
+                        if trade.time not in self._trades_frame.body_widgets['symbol']:
+                            self._trades_frame.add_trade(trade)
+                        # si el trade ya está agregado en la interface, puedo hacer update del pnl, etc
+                        if trade.contract.exchange == "binance":
+                            precision = trade.contract.price_decimals
+                        else:
+                            # Bitmex siempre muestra los saldos en bitcoin (por eso 8 decimales)
+                            precision = 8
+
+                        # muestra el pnl en la interface con formato
+                        pnl_str = "{0:.{prec}f}".format(trade.pnl,prec=precision)
+
+                        self._trades_frame.body_widgets['pnl_var'][trade.time].set(pnl_str)
+                        self._trades_frame.body_widgets['status_var'][trade.time].set(trade.status.capitalize())
+
+            except RuntimeError as e:
+                logger.error("Error while looping through strategies dictionary: %s", e)
+
         # Watchlist prices
         # Uso para
 

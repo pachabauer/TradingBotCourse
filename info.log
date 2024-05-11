@@ -1469,3 +1469,86 @@
 2024-05-10 14:25:05,700 INFO :: Binance New candle for BTCUSDT 1m
 2024-05-10 14:26:00,840 INFO :: Binance New candle for BTCUSDT 1m
 2024-05-10 14:27:17,248 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:28:30,069 INFO :: Binance Futures Client succesfully initialized
+2024-05-11 10:28:31,154 INFO :: Bitmex Client succesfully initialized
+2024-05-11 10:28:31,350 INFO :: Binance Websocket connection opened
+2024-05-11 10:28:32,526 INFO :: Bitmex Websocket connection opened
+2024-05-11 10:29:03,544 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:30:05,444 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:31:05,464 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:32:03,114 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:33:07,751 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:33:07,752 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:33:09,890 INFO :: Binance Futures current USDT balance = 14999.06710252, trade_size = 0.002
+2024-05-11 10:33:09,890 INFO :: short signal on BTCUSDT 1m
+2024-05-11 10:33:10,884 INFO :: Sell order placed on Binance | Status: new
+2024-05-11 10:33:10,885 WARNING :: Binance BTCUSDT: 2653 miliseconds of difference between the current time and the trade time
+2024-05-11 10:33:11,850 INFO :: Binance Futures current USDT balance = 14999.01823684, trade_size = 0.002
+2024-05-11 10:33:11,850 INFO :: short signal on BTCUSDT 1m
+2024-05-11 10:33:12,215 INFO :: Sell order placed on Binance | Status: new
+2024-05-11 10:33:13,856 INFO :: Binance order status: filled
+2024-05-11 10:33:14,600 INFO :: Binance order status: filled
+2024-05-11 10:34:53,262 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:34:53,262 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:35:05,473 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:35:05,473 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:36:09,104 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 10:36:09,104 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 13:49:01,272 INFO :: Binance Futures Client succesfully initialized
+2024-05-11 13:49:02,524 INFO :: Binance Websocket connection opened
+2024-05-11 13:49:02,879 INFO :: Bitmex Client succesfully initialized
+2024-05-11 13:49:04,275 INFO :: Bitmex Websocket connection opened
+2024-05-11 13:49:34,447 INFO :: Binance Futures current USDT balance = 15000.4376, trade_size = 0.024
+2024-05-11 13:49:34,447 INFO :: short signal on BTCUSDT 1m
+2024-05-11 13:49:35,416 INFO :: Sell order placed on Binance | Status: new
+2024-05-11 13:49:38,367 INFO :: Binance order status: filled
+2024-05-11 13:50:04,802 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 13:51:05,861 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:00:55,594 INFO :: Binance Futures Client succesfully initialized
+2024-05-11 14:00:56,861 INFO :: Binance Websocket connection opened
+2024-05-11 14:00:57,002 INFO :: Bitmex Client succesfully initialized
+2024-05-11 14:00:58,254 INFO :: Bitmex Websocket connection opened
+2024-05-11 14:02:00,685 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:03:02,192 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:05:16,861 INFO :: Binance Futures Client succesfully initialized
+2024-05-11 14:05:18,137 INFO :: Binance Websocket connection opened
+2024-05-11 14:05:19,143 INFO :: Bitmex Client succesfully initialized
+2024-05-11 14:05:20,291 INFO :: Bitmex Websocket connection opened
+2024-05-11 14:05:36,943 INFO :: Binance Futures current USDT balance = 14999.84144384, trade_size = 0.024
+2024-05-11 14:05:36,944 INFO :: short signal on BTCUSDT 1m
+2024-05-11 14:05:37,894 INFO :: Sell order placed on Binance | Status: new
+2024-05-11 14:05:40,271 INFO :: Binance order status: filled
+2024-05-11 14:06:09,043 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:07:01,888 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:08:07,886 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:09:01,645 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:10:09,054 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:11:02,292 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:12:56,865 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:13:23,762 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:15:26,605 INFO :: Bitmex New candle for XBTUSD 1m
+2024-05-11 14:16:41,601 INFO :: Bitmex New candle for XBTUSD 1m
+2024-05-11 14:17:31,607 INFO :: Bitmex New candle for XBTUSD 1m
+2024-05-11 14:23:51,720 INFO :: Binance Futures Client succesfully initialized
+2024-05-11 14:23:52,484 INFO :: Bitmex Client succesfully initialized
+2024-05-11 14:23:53,051 INFO :: Binance Websocket connection opened
+2024-05-11 14:23:53,513 INFO :: Bitmex Websocket connection opened
+2024-05-11 14:24:12,271 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:25:16,495 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:26:07,785 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:27:09,291 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:28:01,579 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:28:53,184 INFO :: Binance Futures current USDT balance = 14999.24816192, trade_size = 0.024
+2024-05-11 14:28:53,184 INFO :: long signal on BTCUSDT 1m
+2024-05-11 14:28:54,142 INFO :: Buy order placed on Binance | Status: new
+2024-05-11 14:28:54,143 WARNING :: Binance BTCUSDT: 2561 miliseconds of difference between the current time and the trade time
+2024-05-11 14:28:56,520 INFO :: Binance order status: filled
+2024-05-11 14:29:03,744 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:30:03,511 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:31:16,702 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:32:03,073 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:33:04,147 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:34:03,599 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:35:07,559 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:36:13,591 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-11 14:37:16,283 INFO :: Binance New candle for BTCUSDT 1m
