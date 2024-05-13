@@ -7,6 +7,8 @@ from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
 
+if typing.TYPE_CHECKING:
+    from interface.root_component import Root
 
 class StrategyEditor(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
@@ -15,7 +17,7 @@ class StrategyEditor(tk.Frame):
     # necesitaré acceder a los conectores debido a que voy a detener la conexión a un exchange y conectarme al otro
     # y viceversa.
 
-    def __init__(self, root, binance: BinanceFuturesClient, bitmex: BitmexClient, *args, **kwargs):
+    def __init__(self, root: "Root", binance: BinanceFuturesClient, bitmex: BitmexClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Creo la variable de instancia que pasé como argumento, ya que así podré acceder al método add_log() del
@@ -314,7 +316,7 @@ class StrategyEditor(tk.Frame):
                     self.body_widgets[code_name][b_index].config(state=tk.DISABLED)
 
             # cambio el color y valor del botón clickeado (ya que quedó disabled)
-            self.body_widgets["activation"][b_index].config(bg="darkgreen", text="ON")
+            self.body_widgets['activation'][b_index].config(bg="darkgreen", text="ON")
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} started")
 
         else:
@@ -328,7 +330,7 @@ class StrategyEditor(tk.Frame):
                     self.body_widgets[code_name][b_index].config(state=tk.NORMAL)
 
             # cambio el color y valor del botón clickeado (ya que quedó disabled)
-            self.body_widgets["activation"][b_index].config(bg="darkred", text="OFF")
+            self.body_widgets['activation'][b_index].config(bg="darkred", text="OFF")
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} stopped")
 
         return

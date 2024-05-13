@@ -22,7 +22,7 @@ TF_EQUIV = {"1m": 60, "5m": 300, "15m": 900, "30m": 1800, "1h": 3600, "4h": 1440
 
 
 # Clase base de cualquier estrategia que tenga el TradingBot
-class Strategy():
+class Strategy:
     # Agrego el Union y las opciones van entre "" para poder usarlas, debido al TYPE_CHECKING
     # Agrego el nombre de la estrategia como parámetro para pasarlo dentro del objeto nuevo creado en models Trade
     # que pide guardar la estrategia en el nuevo trade
@@ -55,7 +55,6 @@ class Strategy():
         logger.info("%s", msg)
         self.logs.append({"log": msg, "displayed": False})
 
-
     # creo un método para parsear la información del trade (precio, quantity, stop, etc)
     def parse_trades(self, price: float, size: float, timestamp: int) -> str:
 
@@ -63,8 +62,8 @@ class Strategy():
         # de updates candles se ralentice y se haga imposible de operar por los delays. Le establezco al menos 2
         # segundos entre trades.
         timestamp_diff = int(time.time() * 1000) - timestamp
-        if timestamp_diff > 2000:
-            logger.warning("%s %s: %s miliseconds of difference between the current time and the trade time",
+        if timestamp_diff >= 2000:
+            logger.warning("%s %s: %s milliseconds of difference between the current time and the trade time",
                            self.exchange, self.contract.symbol, timestamp_diff)
 
         last_candle = self.candles[-1]
@@ -83,6 +82,11 @@ class Strategy():
                 last_candle.high = price
             elif price < last_candle.low:
                 last_candle.low = price
+
+            # Agrego para chequear take profit o stop loss
+            for trade in self.trades:
+                if trade.status == "open" and trade.entry_price is not None:
+                    self._check_tp_sl(trade)
 
             return "same_candle"
 
@@ -159,8 +163,6 @@ class Strategy():
         t = Timer(2.0, lambda: self._check_order_status(order_id))
         t.start()
 
-
-
     def _open_position(self, signal_result: int):
 
         trade_size = self.client.get_trade_size(self.contract, self.candles[-1].close, self.balance_pct)
@@ -171,7 +173,7 @@ class Strategy():
         order_side = "buy" if signal_result == 1 else "sell"
         # agregamos la posicion al log
         position_side = "long" if signal_result == 1 else "short"
-        self._add_log(f"{position_side} signal on {self.contract.symbol} {self.tf}")
+        self._add_log(f"{position_side.capitalize()} signal on {self.contract.symbol} {self.tf}")
 
         # pasamos la orden al cliente
         order_status = self.client.place_order(self.contract, "MARKET", trade_size, order_side)
@@ -198,13 +200,56 @@ class Strategy():
             # Va a ser una lista que guarde el Trade.
             new_trade = Trade({"time": int(time.time() * 1000), "entry_price": avg_fill_price,
                                "contract": self.contract, "strategy": self.stat_name, "side": position_side,
-                               "status": "open", "pnl": 0,"quantity": trade_size, "entry_id": order_status.order_id})
+                               "status": "open", "pnl": 0, "quantity": trade_size, "entry_id": order_status.order_id})
 
             self.trades.append(new_trade)
 
+    def _check_tp_sl(self, trade: Trade):
+
+        # Variables boolean que disparan el take profit o stop loss
+        tp_triggered = False
+        sl_triggered = False
+
+        # comparo el precio actual contra el precio de entrada del trade
+        price = self.candles[-1].close
+
+        if trade.side == "long":
+            if self.stop_loss is not None:
+                # si el precio es menor o igual al stop loss exit price
+                if price <= trade.entry_price * (1 - self.stop_loss / 100):
+                    sl_triggered = True
+            if self.take_profit is not None:
+                # si el precio es menor o igual al stop loss exit price
+                if price >= trade.entry_price * (1 + self.take_profit / 100):
+                    tp_triggered = True
+
+        elif trade.side == "short":
+            if self.stop_loss is not None:
+                # si el precio es menor o igual al stop loss exit price
+                if price >= trade.entry_price * (1 + self.stop_loss / 100):
+                    sl_triggered = True
+            if self.take_profit is not None:
+                # si el precio es menor o igual al stop loss exit price
+                if price <= trade.entry_price * (1 - self.take_profit / 100):
+                    tp_triggered = True
+
+        # Si alguno de los 2 es True mandamos log que informa el exit position
+        if tp_triggered or sl_triggered:
+
+            self._add_log(f"{'Stop loss' if sl_triggered else 'Take profit'} for {self.contract.symbol} {self.tf}")
+            # Informo la parte contraria SELL si estaba long, BUY si estaba short
+            order_side = "SELL" if trade.side == "long" else "BUY"
+            order_status = self.client.place_order(self.contract, "MARKET", trade.quantity, order_side)
+
+            if order_status is not None:
+                self._add_log(f"Exit order on {self.contract.symbol} {self.tf} placed successfully")
+                trade.status = "closed"
+                self.ongoing_position = False
+
 
 class TechnicalStrategy(Strategy):
-    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
+    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float,
+                 take_profit: float,
                  stop_loss: float, other_params: Dict):
         super().__init__(client, contract, exchange, timeframe, balance_pct, take_profit, stop_loss, "Technical")
 
@@ -235,7 +280,7 @@ class TechnicalStrategy(Strategy):
         down[down > 0] = 0
 
         # calculo las ema para el rsi - com significa center of mass
-        avg_gain = up.ewm(com=(self._rsi_length - 1), min_periods = self._rsi_length).mean()
+        avg_gain = up.ewm(com=(self._rsi_length - 1), min_periods=self._rsi_length).mean()
         # convierto los negativos a positivos para registrarlos en la lista con abs()
         avg_loss = down.abs().ewm(com=(self._rsi_length - 1), min_periods=self._rsi_length).mean()
 
@@ -292,14 +337,14 @@ class TechnicalStrategy(Strategy):
             signal_result = self._check_signal()
 
             # -1 se refiere a short y 1 a long, es decir si el signal_result ya dio para hacer un short o long
-            if signal_result in [-1, 1]:
+            if signal_result in [1, -1]:
                 # abro la posición
                 self._open_position(signal_result)
 
 
-
 class BreakoutStrategy(Strategy):
-    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float, take_profit: float,
+    def __init__(self, client, contract: Contract, exchange: str, timeframe: str, balance_pct: float,
+                 take_profit: float,
                  stop_loss: float, other_params: Dict):
         super().__init__(client, contract, exchange, timeframe, balance_pct, take_profit, stop_loss, "Breakout")
 
@@ -327,6 +372,6 @@ class BreakoutStrategy(Strategy):
             signal_result = self._check_signal()
 
             # -1 se refiere a short y 1 a long, es decir si el signal_result ya dio para hacer un short o long
-            if signal_result in [-1, 1]:
+            if signal_result in [1, -1]:
                 # abro la posición
                 self._open_position(signal_result)
