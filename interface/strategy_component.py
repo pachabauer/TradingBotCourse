@@ -6,6 +6,7 @@ from interface.styling import *
 from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
+from utils import *
 
 if typing.TYPE_CHECKING:
     from interface.root_component import Root
@@ -24,6 +25,9 @@ class StrategyEditor(tk.Frame):
         # root_component para mostrar un mensaje de log en la interface si el switch_strategy() devuelve return
         # debido a que no se ingresaron la totalidad de los parámetros.
         self.root = root
+
+        self._valid_integer = self.register(check_integer_format)
+        self._valid_float = self.register(check_float_format)
 
         # Accedo a los conectores para el método switch_strategy()
         self._exchanges = {"Binance": binance, "Bitmex": bitmex}
@@ -142,7 +146,20 @@ class StrategyEditor(tk.Frame):
                 self.body_widgets[code_name][b_index].config(width=base_param['width'])
 
             elif base_param['widget'] == tk.Entry:
-                self.body_widgets[code_name][b_index] = tk.Entry(self._table_frame, justify=tk.CENTER)
+                self.body_widgets[code_name][b_index] = tk.Entry(self._table_frame, justify=tk.CENTER,
+                                                                 highlightthickness=False)
+
+                # si es un entero, le paso una validación que ejecute la funcion self._valid_integer cuando presione
+                # una tecla validate =  "key" (key es una tecla). %P es lo que indica cual será el argumento
+                # de la callback function (self_validate_key), en este caso un texto nuevo ="%P"
+                if base_param['data_type'] == int:
+                    self.body_widgets[code_name][b_index].config(validate="key", validatecommand=(
+                        self._valid_integer, "%P"))
+
+                elif base_param['data_type'] == float:
+                    self.body_widgets[code_name][b_index].config(validate="key", validatecommand=(
+                        self._valid_float, "%P"))
+
             elif base_param['widget'] == tk.Button:
                 # la parte del command es un quilombo, así que lo explico: el command es lo que dispara el botón
                 # al hacer click. En este caso dispara un callback, mediante el lambda method. Pero "guardamos"
@@ -209,7 +226,17 @@ class StrategyEditor(tk.Frame):
             if param['widget'] == tk.Entry:
                 self._extra_input[code_name] = tk.Entry(self._popup_window, bg=BG_COLOR2, justify=tk.CENTER,
                                                         fg=FG_COLOR,
-                                                        insertbackground=FG_COLOR)
+                                                        insertbackground=FG_COLOR,
+                                                        highlightthickness=False)
+
+                # si es un entero, le paso una validación que ejecute la funcion self._valid_integer cuando presione
+                # una tecla validate =  "key" (key es una tecla). %P es lo que indica cual será el argumento
+                # de la callback function (self_validate_key), en este caso un texto nuevo ="%P"
+                if param['data_type'] == int:
+                    self._extra_input[code_name].config(validate="key", validatecommand=(self._valid_integer, "%P"))
+
+                elif param['data_type'] == float:
+                    self._extra_input[code_name].config(validate="key", validatecommand=(self._valid_float, "%P"))
 
                 if self._additional_parameters[b_index][code_name] is not None:
                     self._extra_input[code_name].insert(tk.END, str(self._additional_parameters[b_index][code_name]))
