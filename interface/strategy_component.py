@@ -1,8 +1,10 @@
 ## Este módulo es para armar la interface de estrategias, no para crear estrategias en sí .
+# Tendrá cambios de acuerdo a si se usa windows o Mac. Ver video 55
 
 import tkinter as tk
 import typing
 from interface.styling import *
+from interface.scrollable_frame import ScrollableFrame
 from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
@@ -10,6 +12,7 @@ from utils import *
 
 if typing.TYPE_CHECKING:
     from interface.root_component import Root
+
 
 class StrategyEditor(tk.Frame):
     # paso una lista de contratos de cada exchange, para que cuando los seleccione en el box, aparezca un listado
@@ -54,7 +57,8 @@ class StrategyEditor(tk.Frame):
 
         # Se crean diccionarios para almacenar widgets y una lista de encabezados.
         self.body_widgets = dict()
-        self._headers = ["Strategy", "Contract", "Timeframe", "Balance %", "TP %", "SL %"]
+        # header para el Frame
+        self._headers_frame = tk.Frame(self._table_frame, bg=BG_COLOR)
 
         # cada vez que agregue una nueva estrategia (una nueva fila) guardare los valores de los parametros
         # en este diccionario
@@ -69,24 +73,25 @@ class StrategyEditor(tk.Frame):
             # las keys son el nombre de la estrategia, un desplegable para elegir el widget a usar
             # el tipo de dato y la estrategia a utilizar (que crearemos mas adelante, llamada Technical o Breakout)
             {"code_name": "strategy_type", "widget": tk.OptionMenu, "data_type": str,
-             "values": ["Technical", "Breakout"], "width": 10},
+             "values": ["Technical", "Breakout"], "width": 10, "header": "Strategy"},
             {"code_name": "contract", "widget": tk.OptionMenu, "data_type": str,
-             "values": self._all_contracts, "width": 15},
+             "values": self._all_contracts, "width": 15, "header": "Contract"},
             {"code_name": "timeframe", "widget": tk.OptionMenu, "data_type": str,
-             "values": self._all_timeframes, "width": 7},
+             "values": self._all_timeframes, "width": 10, "header": "Timeframe"},
             {"code_name": "balance_pct", "widget": tk.Entry, "data_type": float,
-             "width": 7},
+             "width": 10, "header": "Balance %"},
             {"code_name": "take_profit", "widget": tk.Entry, "data_type": float,
-             "width": 7},
+             "width": 7, "header": "TP %"},
             {"code_name": "stop_loss", "widget": tk.Entry, "data_type": float,
-             "width": 7},
+             "width": 7, "header": "SL %"},
             # Botones
+            # Para los botones el header será vacío ""
             {"code_name": "parameters", "widget": tk.Button, "data_type": float,
-             "text": "Parameters", "bg": BG_COLOR2, "command": self._show_popup},
+             "text": "Parameters", "bg": BG_COLOR2, "command": self._show_popup, "header": "", "width": 10},
             {"code_name": "activation", "widget": tk.Button, "data_type": float,
-             "text": "OFF", "bg": "darkred", "command": self._switch_strategy},
+             "text": "OFF", "bg": "darkred", "command": self._switch_strategy, "header": "", "width": 8},
             {"code_name": "delete", "widget": tk.Button, "data_type": float,
-             "text": "X", "bg": "darkred", "command": self._delete_row},
+             "text": "X", "bg": "darkred", "command": self._delete_row, "header": "", "width": 6},
 
         ]
 
@@ -111,10 +116,21 @@ class StrategyEditor(tk.Frame):
         # y a la posición (idx)
         # La idea del for es popular los datos de las widgets dinámicamente
         # Se crean etiquetas de encabezado y se colocan en la primera fila de la tabla.
-        for idx, h in enumerate(self._headers):
+        for idx, h in enumerate(self._base_params):
             # uso el inline if para decir si tiene datos, mostrá el remove, sino ""
-            header = tk.Label(self._table_frame, text=h, bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
-            header.grid(row=0, column=idx)
+            header = tk.Label(self._headers_frame, text=h['header'], bg=BG_COLOR, fg=FG_COLOR, font=GLOBAL_FONT,
+                              width=h['width'], bd=1, relief=tk.FLAT)
+            header.grid(row=0, column=idx, padx=2)
+
+        header = tk.Label(self._headers_frame, text="", bg=BG_COLOR, fg=FG_COLOR, font=GLOBAL_FONT,
+                          width=8, bd=1, relief=tk.FLAT)
+        header.grid(row=0, column=len(self._base_params), padx=2)
+
+        self._headers_frame.pack(side=tk.TOP, anchor="nw")
+
+        # Creo el scrollable frame
+        self._body_frame = ScrollableFrame(self._table_frame, bg=BG_COLOR, height=250)
+        self._body_frame.pack(side=tk.TOP, fill=tk.X, anchor="nw")
 
         # itero para completar dinámicamente las etiquetas del widget
         # Se inicializan los diccionarios para almacenar widgets y variables.
@@ -140,14 +156,18 @@ class StrategyEditor(tk.Frame):
                 # en este caso cada estrategia tendrá como default BTCUSDT (en el caso de Binance).
                 self.body_widgets[code_name + "_var"][b_index].set(base_param['values'][0])
                 # Se usa el * delante de una lista para hacer unpack de la misma
-                self.body_widgets[code_name][b_index] = tk.OptionMenu(self._table_frame,
+                self.body_widgets[code_name][b_index] = tk.OptionMenu(self._body_frame.sub_frame,
                                                                       self.body_widgets[code_name + "_var"][b_index],
                                                                       *base_param['values'])
-                self.body_widgets[code_name][b_index].config(width=base_param['width'])
+                self.body_widgets[code_name][b_index].config(width=base_param['width'],
+                                                             # le cambio a 0 el indicatoron (para que no se vea
+                                                             # el icono y se muestre bien alineada la pantalla
+                                                             bd=0,  indicatoron=0)
 
             elif base_param['widget'] == tk.Entry:
-                self.body_widgets[code_name][b_index] = tk.Entry(self._table_frame, justify=tk.CENTER,
-                                                                 highlightthickness=False)
+                self.body_widgets[code_name][b_index] = tk.Entry(self._body_frame.sub_frame, justify=tk.CENTER,
+                                                                 font=GLOBAL_FONT, bd=1,
+                                                                 width=base_param['width'])
 
                 # si es un entero, le paso una validación que ejecute la funcion self._valid_integer cuando presione
                 # una tecla validate =  "key" (key es una tecla). %P es lo que indica cual será el argumento
@@ -165,15 +185,15 @@ class StrategyEditor(tk.Frame):
                 # al hacer click. En este caso dispara un callback, mediante el lambda method. Pero "guardamos"
                 # ese valor disparado por el callback en una variable frozen para que no cambie cada vez
                 # que iteramos sobre ese método y quede fijada.
-                self.body_widgets[code_name][b_index] = tk.Button(self._table_frame, text=base_param['text'],
-                                                                  bg=base_param['bg'], fg=FG_COLOR,
-                                                                  command=lambda frozen_command=
-                                                                                 base_param['command']:
+                self.body_widgets[code_name][b_index] = tk.Button(self._body_frame.sub_frame, text=base_param['text'],
+                                                                  bg=base_param['bg'], fg=FG_COLOR, font=GLOBAL_FONT,
+                                                                  width=base_param['width'],
+                                                                  command=lambda frozen_command=base_param['command']:
                                                                   frozen_command(b_index))
             else:
                 continue
 
-            self.body_widgets[code_name][b_index].grid(row=b_index, column=col)
+            self.body_widgets[code_name][b_index].grid(row=b_index, column=col, padx=2, pady=2)
 
         # Lo uso para crear parametros adicionales necesarios para determinada estrategia
         self._additional_parameters[b_index] = dict()
@@ -185,6 +205,12 @@ class StrategyEditor(tk.Frame):
                 self._additional_parameters[b_index][param['code_name']] = None
 
         self._body_index += 1
+
+    def _delete_row(self, b_index: int):
+
+        for element in self._base_params:
+            self.body_widgets[element['code_name']][b_index].grid_forget()
+            del self.body_widgets[element['code_name']][b_index]
 
     def _show_popup(self, b_index: int):
 
@@ -361,9 +387,3 @@ class StrategyEditor(tk.Frame):
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} stopped")
 
         return
-
-    def _delete_row(self, b_index: int):
-
-        for element in self._base_params:
-            self.body_widgets[element['code_name']][b_index].grid_forget()
-            del self.body_widgets[element['code_name']][b_index]

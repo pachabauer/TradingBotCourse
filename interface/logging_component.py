@@ -14,7 +14,7 @@ class Logging(tk.Frame):
         # el state se refiere a que no podré interactuar como usuario desde la interfaz con el widget (como un
         # solo lectura si está en DISABLED)
         self.logging_text = tk.Text(self, height=10, width=60, state=tk.DISABLED, bg=BG_COLOR, fg=FG_COLOR_2,
-                                    font=GLOBAL_FONT)
+                                    font=GLOBAL_FONT, highlightthickness=False, bd=0)
         # usa pack porque la estructura de la interface no es compleja, entonces no le hace falta usar grid()
         self.logging_text.pack(side=tk.TOP)
 

@@ -5,6 +5,7 @@ import typing
 from models import *
 from interface.styling import *
 from interface.autocomplete_widget import Autocomplete
+from interface.scrollable_frame import ScrollableFrame
 
 
 class Watchlist(tk.Frame):
@@ -55,15 +56,29 @@ class Watchlist(tk.Frame):
         self.body_widgets = dict()
         self._headers = ["symbol", "exchange", "bid", "ask", "remove"]
 
+        self._headers_frame = tk.Frame(self._table_frame, bg=BG_COLOR)
+
+        self._col_width = 11
+
         # la función enumerate nos permite acceder al mismo tiempo al valor del elemento de la lista (h)
         # y a la posición (idx)
         # La idea del for es popular los datos de las widgets dinámicamente
         # Se crean etiquetas de encabezado y se colocan en la primera fila de la tabla.
         for idx, h in enumerate(self._headers):
             # uso el inline if para decir si tiene datos, mostrá el remove, sino ""
-            header = tk.Label(self._table_frame, text=h.capitalize() if h != "remove" else "", bg=BG_COLOR, fg=FG_COLOR,
-                              font=BOLD_FONT)
+            header = tk.Label(self._headers_frame, text=h.capitalize() if h != "remove" else "", bg=BG_COLOR, fg=FG_COLOR,
+                              font=GLOBAL_FONT, width=self._col_width)
             header.grid(row=0, column=idx)
+
+        # agrego un label adicional para llevar el width para llevar el scrollbar a la derecha
+        header = tk.Label(self._headers_frame, text="", bg=BG_COLOR, fg=FG_COLOR,
+                          font=GLOBAL_FONT, width=2)
+        header.grid(row=0, column=len(self._headers))
+
+        self._headers_frame.pack(side=tk.TOP, anchor="nw")
+
+        self._body_frame = ScrollableFrame(self._table_frame, bg=BG_COLOR, height=250)
+        self._body_frame.pack(side=tk.TOP, fill=tk.X, anchor="nw")
 
         # itero para completar dinámicamente las etiquetas del widget
         # symbol, exchange, bid, ask
@@ -78,7 +93,7 @@ class Watchlist(tk.Frame):
         # una variable int que se posiciona en la última fila de la tabla y se irá incrementando a medida
         # que se agregue filas (datos) de ["symbol", "exchange", "bid", "ask"]
         # empieza en 1 porque la fila 0 son los headers mencionados
-        self._body_index = 1
+        self._body_index = 0
 
     # Lo usamos para remover un symbol de la watchlist
     def _remove_symbol(self, b_index: int):
@@ -111,12 +126,12 @@ class Watchlist(tk.Frame):
         # cada vez que ejecuto el add_symbol() se incrementa la variable del indice
         b_index = self._body_index
 
-        self.body_widgets['symbol'][b_index] = tk.Label(self._table_frame, text=symbol, bg=BG_COLOR, fg=FG_COLOR_2,
-                                                        font=GLOBAL_FONT)
+        self.body_widgets['symbol'][b_index] = tk.Label(self._body_frame.sub_frame, text=symbol, bg=BG_COLOR,
+                                                        fg=FG_COLOR_2, font=GLOBAL_FONT, width=self._col_width)
         self.body_widgets['symbol'][b_index].grid(row=b_index, column=0)
 
-        self.body_widgets['exchange'][b_index] = tk.Label(self._table_frame, text=exchange, bg=BG_COLOR, fg=FG_COLOR_2,
-                                                          font=GLOBAL_FONT)
+        self.body_widgets['exchange'][b_index] = tk.Label(self._body_frame.sub_frame, text=exchange, bg=BG_COLOR,
+                                                          fg=FG_COLOR_2,font=GLOBAL_FONT, width=self._col_width)
         self.body_widgets['exchange'][b_index].grid(row=b_index, column=1)
 
         # Acá cambio a textVariable , ya que el valor que aparezca ahí va a ser variable (las cotizaciones
@@ -124,18 +139,18 @@ class Watchlist(tk.Frame):
         # El valor de este parámetro, por ello debe ser un tkinter StringVar Object
         self.body_widgets['bid_var'][b_index] = tk.StringVar()
 
-        self.body_widgets['bid'][b_index] = tk.Label(self._table_frame,
+        self.body_widgets['bid'][b_index] = tk.Label(self._body_frame.sub_frame,
                                                      textvariable=self.body_widgets['bid_var'][b_index],
                                                      bg=BG_COLOR, fg=FG_COLOR_2,
-                                                     font=GLOBAL_FONT)
+                                                     font=GLOBAL_FONT, width=self._col_width)
         self.body_widgets['bid'][b_index].grid(row=b_index, column=2)
 
         self.body_widgets['ask_var'][b_index] = tk.StringVar()
 
-        self.body_widgets['ask'][b_index] = tk.Label(self._table_frame,
+        self.body_widgets['ask'][b_index] = tk.Label(self._body_frame.sub_frame,
                                                      textvariable=self.body_widgets['ask_var'][b_index],
                                                      bg=BG_COLOR, fg=FG_COLOR_2,
-                                                     font=GLOBAL_FONT)
+                                                     font=GLOBAL_FONT, width=self._col_width)
         self.body_widgets['ask'][b_index].grid(row=b_index, column=3)
 
         # en el command defino el trigger que se va a ejecutar cuando haga click en el botón de "borrar".
@@ -143,11 +158,12 @@ class Watchlist(tk.Frame):
         # entonces como los callbacks no llevan argumentos, para forzar un callback uso la palabra reservada
         # lambda, adelante del método, para que no se ejecute automaticamente (al tener argumentos) y esperar
         # a tocar el botón para ejecutarse
-        self.body_widgets['remove'][b_index] = tk.Button(self._table_frame,
+        self.body_widgets['remove'][b_index] = tk.Button(self._body_frame.sub_frame,
                                                          text="X",
                                                          bg="darkred", fg=FG_COLOR,
                                                          font=GLOBAL_FONT,
-                                                         command=lambda: self._remove_symbol(b_index))
+                                                         command=lambda: self._remove_symbol(b_index),
+                                                         width=4)
         self.body_widgets['remove'][b_index].grid(row=b_index, column=4)
 
         self._body_index += 1
