@@ -4,6 +4,7 @@ import tkinter as tk
 import typing
 from models import *
 from interface.styling import *
+from interface.autocomplete_widget import Autocomplete
 
 
 class Watchlist(tk.Frame):
@@ -32,8 +33,8 @@ class Watchlist(tk.Frame):
 
         # Acá ponemos los entry boxes (para ingresar la crypto a buscar y agregar a la watchlist
         # insertbackground es el color del cursor dentro del entry
-        self._binance_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
-                                       bg=BG_COLOR2)
+        self._binance_entry = Autocomplete( self.binance_symbols, self._commands_frame, fg=FG_COLOR, justify=tk.CENTER,
+                                            insertbackground=FG_COLOR, bg=BG_COLOR2)
 
         # bind() nos permite agregar una funcionalidad al entry, en este caso cuando presiono enter, llama al
         # callback _add_binance_symbol
@@ -45,8 +46,8 @@ class Watchlist(tk.Frame):
         # especifico que ira top left, pero en la segunda columna (column=1)
         self._bitmex_label.grid(row=0, column=1)
 
-        self._bitmex_entry = tk.Entry(self._commands_frame, fg=FG_COLOR, justify=tk.CENTER, insertbackground=FG_COLOR,
-                                      bg=BG_COLOR2)
+        self._bitmex_entry = Autocomplete(self.bitmex_symbols, self._commands_frame, fg=FG_COLOR, justify=tk.CENTER,
+                                          insertbackground=FG_COLOR, bg=BG_COLOR2)
         self._bitmex_entry.bind("<Return>", self._add_bitmex_symbol)
         self._bitmex_entry.grid(row=1, column=1)
 
