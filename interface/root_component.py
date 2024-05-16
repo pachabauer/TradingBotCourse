@@ -1,5 +1,6 @@
 import logging
 import tkinter as tk
+from tkinter.messagebox import askquestion
 from interface.styling import *
 from interface.logging_component import Logging
 
@@ -23,6 +24,10 @@ class Root(tk.Tk):
         self.bitmex = bitmex
 
         self.title("Trading Bot")
+        # Uso este protocolo para terminar el programa (detener todos los threads) al cerrar la ventana del bot
+        # y llamo al callback para hacerlo
+        self.protocol("WM_DELETE_WINDOW", self._ask_before_close)
+
         # Configuro el background color
         self.configure(bg=BG_COLOR)
         # La idea es tener 4 frames. UP (LEFT RIGHT) Y DOWN (LEFT RIGHT) para poder ubicar 4 funcionalidades a la vista
@@ -52,6 +57,16 @@ class Root(tk.Tk):
         self._trades_frame.pack(side=tk.TOP)
 
         self._update_ui()
+
+    def _ask_before_close(self):
+        result = askquestion("Confirmation", "Do you really want to exit the application?")
+        if result == "yes":
+            self.binance.reconnect = False
+            self.bitmex.reconnect = False
+            self.binance.ws.close()
+            self.bitmex.ws.close()
+
+            self.destroy()
 
     # cada vez que hay un update de información, se ejecutará el update, para actualizar los precios y tenerlos a mano
     # si el log no está en la lista, lo agrega y cada vez que se actualiza el precio, lo agrega a continuación
