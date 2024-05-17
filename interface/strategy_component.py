@@ -1,6 +1,6 @@
 ## Este módulo es para armar la interface de estrategias, no para crear estrategias en sí .
 # Tendrá cambios de acuerdo a si se usa windows o Mac. Ver video 55
-
+import json
 import tkinter as tk
 import typing
 from interface.styling import *
@@ -9,6 +9,7 @@ from connectors.binance_futures import BinanceFuturesClient
 from connectors.bitmex_futures import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
 from utils import *
+from database import WorkspaceData
 
 if typing.TYPE_CHECKING:
     from interface.root_component import Root
@@ -28,6 +29,8 @@ class StrategyEditor(tk.Frame):
         # root_component para mostrar un mensaje de log en la interface si el switch_strategy() devuelve return
         # debido a que no se ingresaron la totalidad de los parámetros.
         self.root = root
+
+        self.db = WorkspaceData()
 
         self._valid_integer = self.register(check_integer_format)
         self._valid_float = self.register(check_float_format)
@@ -62,7 +65,7 @@ class StrategyEditor(tk.Frame):
 
         # cada vez que agregue una nueva estrategia (una nueva fila) guardare los valores de los parametros
         # en este diccionario
-        self._additional_parameters = dict()
+        self.additional_parameters = dict()
 
         self._extra_input = dict()
 
@@ -95,7 +98,7 @@ class StrategyEditor(tk.Frame):
 
         ]
 
-        self._extra_params = {
+        self.extra_params = {
 
             # Acá queda pendiente de resolver qué pasa si queremos agregar más de un indicador en technical o
             # breakout, ya que en el curso solo muestran uno de cada uno, entonces no agrupan el indicador
@@ -141,8 +144,8 @@ class StrategyEditor(tk.Frame):
 
         # una variable int que se posiciona en la última fila de la tabla y se irá incrementando a medida
         # que se agregue filas (datos) de ["symbol", "exchange", "bid", "ask"]
-        # empieza en 1 porque la fila 0 son los headers mencionados
-        self._body_index = 1
+        self._body_index = 0
+        self._load_workspace()
 
     # El loop que crea un entry buttom o un menú de opción de widget
     def _add_strategy_row(self):
@@ -196,13 +199,13 @@ class StrategyEditor(tk.Frame):
             self.body_widgets[code_name][b_index].grid(row=b_index, column=col, padx=2, pady=2)
 
         # Lo uso para crear parametros adicionales necesarios para determinada estrategia
-        self._additional_parameters[b_index] = dict()
+        self.additional_parameters[b_index] = dict()
 
         # itera sobre Technical y Breakout (las estrategias).
-        for strat, params in self._extra_params.items():
+        for strat, params in self.extra_params.items():
             # Itera sobre los diccionarios dentro de Technical y Breakout
             for param in params:
-                self._additional_parameters[b_index][param['code_name']] = None
+                self.additional_parameters[b_index][param['code_name']] = None
 
         self._body_index += 1
 
@@ -243,7 +246,7 @@ class StrategyEditor(tk.Frame):
 
         row_nb = 0
 
-        for param in self._extra_params[strat_selected]:
+        for param in self.extra_params[strat_selected]:
             # itero los parámetros a través de la etiqueta
             code_name = param['code_name']
             temp_label = tk.Label(self._popup_window, bg=BG_COLOR, fg=FG_COLOR, text=param['name'], font=BOLD_FONT)
@@ -264,8 +267,8 @@ class StrategyEditor(tk.Frame):
                 elif param['data_type'] == float:
                     self._extra_input[code_name].config(validate="key", validatecommand=(self._valid_float, "%P"))
 
-                if self._additional_parameters[b_index][code_name] is not None:
-                    self._extra_input[code_name].insert(tk.END, str(self._additional_parameters[b_index][code_name]))
+                if self.additional_parameters[b_index][code_name] is not None:
+                    self._extra_input[code_name].insert(tk.END, str(self.additional_parameters[b_index][code_name]))
 
             else:
                 continue
@@ -289,13 +292,13 @@ class StrategyEditor(tk.Frame):
         # estrategia)
         strat_selected = self.body_widgets['strategy_type_var'][b_index].get()
 
-        for param in self._extra_params[strat_selected]:
+        for param in self.extra_params[strat_selected]:
             code_name = param['code_name']
 
             if self._extra_input[code_name].get() == "":
-                self._additional_parameters[b_index][code_name] = None
+                self.additional_parameters[b_index][code_name] = None
             else:
-                self._additional_parameters[b_index][code_name] = param['data_type'](self._extra_input[code_name].get())
+                self.additional_parameters[b_index][code_name] = param['data_type'](self._extra_input[code_name].get())
 
         # cuando presionamos el botón de validate del popup de parámetros, se borra la ventana de popup
         self._popup_window.destroy()
@@ -317,8 +320,8 @@ class StrategyEditor(tk.Frame):
         # completados por el usuario
         strat_selected = self.body_widgets['strategy_type_var'][b_index].get()
 
-        for param in self._extra_params[strat_selected]:
-            if self._additional_parameters[b_index][param['code_name']] is None:
+        for param in self.extra_params[strat_selected]:
+            if self.additional_parameters[b_index][param['code_name']] is None:
                 self.root.logging_frame.add_log(f"Missing {param['code_name']} parameter")
                 return
 
@@ -340,10 +343,10 @@ class StrategyEditor(tk.Frame):
                 # agrego el exchange, ya que cada vez que efectue una nueva estrategia, el tamaño del trade
                 # será distinto dependiendo del exchange (la forma de calcularlo)
                 new_strategy = TechnicalStrategy(self._exchanges[exchange], contract, exchange, timeframe, balance_pct,
-                                                 take_profit, stop_loss, self._additional_parameters[b_index])
+                                                 take_profit, stop_loss, self.additional_parameters[b_index])
             elif strat_selected == "Breakout":
                 new_strategy = BreakoutStrategy(self._exchanges[exchange], contract, exchange, timeframe, balance_pct,
-                                                take_profit, stop_loss, self._additional_parameters[b_index])
+                                                take_profit, stop_loss, self.additional_parameters[b_index])
             else:
                 return
 
@@ -386,4 +389,28 @@ class StrategyEditor(tk.Frame):
             self.body_widgets['activation'][b_index].config(bg="darkred", text="OFF")
             self.root.logging_frame.add_log(f"{strat_selected} strategy on {symbol} / {timeframe} stopped")
 
-        return
+    # método para cargar el workspace strategies (de la db) cuando abrimos el programa
+    def _load_workspace(self):
+
+        data = self.db.get("strategies")
+        # itero para ir agregando las rows que están en la db en el workspace
+        for row in data:
+            self._add_strategy_row()
+            # menos 1 porque en el método que agregamos rows, siempre incrementamos 1 (entonces hay que restar 1)
+            b_index = self._body_index - 1
+
+            for base_param in self._base_params:
+                code_name = base_param['code_name']
+                # traigo la Row de la db si ésta tiene data
+                if base_param['widget'] == tk.OptionMenu and row[code_name] is not None:
+                    self.body_widgets[code_name + "_var"][b_index].set(row[code_name])
+                elif base_param['widget'] == tk.Entry and row[code_name] is not None:
+                    self.body_widgets[code_name][b_index].insert(tk.END, row[code_name])
+
+            extra_params = json.loads(row['extra_params'])
+
+            for param, value in extra_params.items():
+                if value is not None:
+                    self.additional_parameters[b_index][param] = value
+
+

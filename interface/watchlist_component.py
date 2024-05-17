@@ -6,6 +6,7 @@ from models import *
 from interface.styling import *
 from interface.autocomplete_widget import Autocomplete
 from interface.scrollable_frame import ScrollableFrame
+from database import WorkspaceData
 
 
 class Watchlist(tk.Frame):
@@ -15,6 +16,9 @@ class Watchlist(tk.Frame):
     def __init__(self, binance_contracts: typing.Dict[str, Contract], bitmex_contracts: typing.Dict[str, Contract],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # creamos la variable en el componente para usarlo en el menú (root) y guardar la watchlist en la db
+        self.db = WorkspaceData()
 
         # Se crean listas de símbolos para los contratos de Binance y Bitmex.
         self.binance_symbols = list(binance_contracts.keys())
@@ -94,6 +98,11 @@ class Watchlist(tk.Frame):
         # que se agregue filas (datos) de ["symbol", "exchange", "bid", "ask"]
         # empieza en 1 porque la fila 0 son los headers mencionados
         self._body_index = 0
+
+        # para cargar los contratos guardados en la db en la watchlist cuando abrimos el programa.
+        saved_symbols = self.db.get("watchlist")
+        for s in saved_symbols:
+            self._add_symbol(s['symbol'], s['exchange'])
 
     # Lo usamos para remover un symbol de la watchlist
     def _remove_symbol(self, b_index: int):

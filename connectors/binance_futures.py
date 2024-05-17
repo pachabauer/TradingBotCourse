@@ -67,6 +67,9 @@ class BinanceFuturesClient:
         self.ws: websocket.WebSocketApp
         self.reconnect = True
 
+        self.ws_connected = False
+        self.ws_subscriptions = {"bookTicker": [], "aggTrade": []}
+
         t = threading.Thread(target=self._start_ws)
         t.start()
 

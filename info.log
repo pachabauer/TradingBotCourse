@@ -7123,3 +7123,65 @@
 2024-05-16 11:30:41,491 INFO :: Bitmex Websocket connection opened
 2024-05-16 11:30:48,913 WARNING :: Binance Websocket connection closed
 2024-05-16 11:30:49,154 WARNING :: Bitmex Websocket connection closed
+2024-05-16 11:37:43,227 INFO :: Binance Futures Client succesfully initialized
+2024-05-16 11:37:44,504 INFO :: Binance Websocket connection opened
+2024-05-16 11:37:45,488 INFO :: Bitmex Client succesfully initialized
+2024-05-16 11:37:46,561 INFO :: Bitmex Websocket connection opened
+2024-05-16 11:37:52,362 WARNING :: Binance Websocket connection closed
+2024-05-16 11:37:52,595 WARNING :: Bitmex Websocket connection closed
+2024-05-17 09:04:37,582 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 09:04:38,633 INFO :: Bitmex Client succesfully initialized
+2024-05-17 09:04:38,890 INFO :: Binance Websocket connection opened
+2024-05-17 09:04:39,851 INFO :: Bitmex Websocket connection opened
+2024-05-17 09:05:35,599 WARNING :: Binance Websocket connection closed
+2024-05-17 09:05:35,835 WARNING :: Bitmex Websocket connection closed
+2024-05-17 09:19:15,808 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 09:19:16,595 INFO :: Bitmex Client succesfully initialized
+2024-05-17 09:19:17,058 INFO :: Binance Websocket connection opened
+2024-05-17 09:19:17,631 INFO :: Bitmex Websocket connection opened
+2024-05-17 09:21:11,843 WARNING :: Binance Websocket connection closed
+2024-05-17 09:21:12,082 WARNING :: Bitmex Websocket connection closed
+2024-05-17 09:23:51,203 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 09:23:51,959 INFO :: Bitmex Client succesfully initialized
+2024-05-17 09:23:52,479 INFO :: Binance Websocket connection opened
+2024-05-17 09:23:53,022 INFO :: Bitmex Websocket connection opened
+2024-05-17 09:29:14,215 WARNING :: Binance Websocket connection closed
+2024-05-17 09:29:14,449 WARNING :: Bitmex Websocket connection closed
+2024-05-17 09:29:34,303 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 09:29:35,096 INFO :: Bitmex Client succesfully initialized
+2024-05-17 09:29:35,620 INFO :: Binance Websocket connection opened
+2024-05-17 09:29:36,161 INFO :: Bitmex Websocket connection opened
+2024-05-17 09:35:57,642 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 09:35:58,365 INFO :: Bitmex Client succesfully initialized
+2024-05-17 09:35:58,940 INFO :: Binance Websocket connection opened
+2024-05-17 09:35:59,380 INFO :: Bitmex Websocket connection opened
+2024-05-17 10:50:24,665 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 10:50:25,950 INFO :: Binance Websocket connection opened
+2024-05-17 10:50:25,978 INFO :: Bitmex Client succesfully initialized
+2024-05-17 10:50:27,118 INFO :: Bitmex Websocket connection opened
+2024-05-17 10:50:55,571 WARNING :: Binance Websocket connection closed
+2024-05-17 10:50:55,812 WARNING :: Bitmex Websocket connection closed
+2024-05-17 15:07:08,266 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 15:07:09,402 INFO :: Bitmex Client succesfully initialized
+2024-05-17 15:07:09,540 INFO :: Binance Websocket connection opened
+2024-05-17 15:07:10,536 INFO :: Bitmex Websocket connection opened
+2024-05-17 15:09:08,495 WARNING :: Binance Websocket connection closed
+2024-05-17 15:09:08,754 WARNING :: Bitmex Websocket connection closed
+2024-05-17 15:09:20,950 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 15:09:21,907 INFO :: Bitmex Client succesfully initialized
+2024-05-17 15:09:22,281 INFO :: Binance Websocket connection opened
+2024-05-17 15:09:22,951 INFO :: Bitmex Websocket connection opened
+2024-05-17 15:13:53,482 WARNING :: Binance Websocket connection closed
+2024-05-17 15:13:53,956 WARNING :: Bitmex Websocket connection closed
+2024-05-17 15:16:45,249 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 15:16:46,049 INFO :: Bitmex Client succesfully initialized
+2024-05-17 15:16:46,522 INFO :: Binance Websocket connection opened
+2024-05-17 15:16:47,078 INFO :: Bitmex Websocket connection opened
+2024-05-17 15:16:55,436 WARNING :: Binance Websocket connection closed
+2024-05-17 15:16:55,654 WARNING :: Bitmex Websocket connection closed
+2024-05-17 15:33:23,870 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 15:33:25,025 INFO :: Bitmex Client succesfully initialized
+2024-05-17 15:33:25,155 INFO :: Binance Websocket connection opened
+2024-05-17 15:33:26,056 INFO :: Bitmex Websocket connection opened
+2024-05-17 15:33:41,166 WARNING :: Binance Websocket connection closed
+2024-05-17 15:33:41,174 WARNING :: Bitmex Websocket connection closed
