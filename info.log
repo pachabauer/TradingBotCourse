@@ -7185,3 +7185,252 @@
 2024-05-17 15:33:26,056 INFO :: Bitmex Websocket connection opened
 2024-05-17 15:33:41,166 WARNING :: Binance Websocket connection closed
 2024-05-17 15:33:41,174 WARNING :: Bitmex Websocket connection closed
+2024-05-17 17:55:42,061 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 17:55:43,226 INFO :: Bitmex Client succesfully initialized
+2024-05-17 17:55:43,369 INFO :: Binance Websocket connection opened
+2024-05-17 17:55:44,307 INFO :: Bitmex Websocket connection opened
+2024-05-17 17:57:05,184 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 17:58:17,336 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 17:58:19,517 INFO :: Binance Futures current USDT balance = 22427.86626609, trade_size = 0.003
+2024-05-17 17:58:19,517 INFO :: Short signal on BTCUSDT 1m
+2024-05-17 17:58:19,895 INFO :: Sell order placed on Binance | Status: new
+2024-05-17 17:58:22,868 INFO :: Binance order status: filled
+2024-05-17 17:59:01,090 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:00:04,929 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:01:18,548 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:02:08,385 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:03:15,081 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:03:44,359 WARNING :: Binance Websocket connection closed
+2024-05-17 18:03:44,534 WARNING :: Bitmex Websocket connection closed
+2024-05-17 18:19:01,954 INFO :: Binance Futures Client succesfully initialized
+2024-05-17 18:19:02,958 INFO :: Bitmex Client succesfully initialized
+2024-05-17 18:19:03,261 INFO :: Binance Websocket connection opened
+2024-05-17 18:19:03,989 INFO :: Bitmex Websocket connection opened
+2024-05-17 18:20:34,960 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:21:01,319 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:22:11,627 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:23:02,841 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:23:14,622 INFO :: Binance Futures current USDT balance = 22436.20590839, trade_size = 0.003
+2024-05-17 18:23:14,622 INFO :: Short signal on BTCUSDT 1m
+2024-05-17 18:23:15,573 INFO :: Sell order placed on Binance | Status: new
+2024-05-17 18:23:15,573 WARNING :: Binance BTCUSDT: 2494 milliseconds of difference between the current time and the trade time
+2024-05-17 18:23:15,573 WARNING :: Binance BTCUSDT: 2494 milliseconds of difference between the current time and the trade time
+2024-05-17 18:23:15,573 WARNING :: Binance BTCUSDT: 2494 milliseconds of difference between the current time and the trade time
+2024-05-17 18:23:15,574 WARNING :: Binance BTCUSDT: 2495 milliseconds of difference between the current time and the trade time
+2024-05-17 18:23:18,530 INFO :: Binance order status: filled
+2024-05-17 18:24:08,010 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:25:06,039 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:26:15,326 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:27:00,833 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:28:07,146 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:29:12,333 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:30:07,221 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:31:13,684 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:32:02,120 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:33:06,592 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:34:04,437 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:35:04,816 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:36:01,532 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:37:08,030 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:38:40,109 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:39:07,023 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:40:19,478 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:41:07,131 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:42:01,359 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:44:34,999 INFO :: Binance missing 1 candles for BTCUSDT 1m (1715982274274 1715982120000)
+2024-05-17 18:45:05,850 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:46:22,403 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:47:24,810 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:48:36,546 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:50:10,892 INFO :: Binance missing 1 candles for BTCUSDT 1m (1715982610157 1715982480000)
+2024-05-17 18:51:10,364 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:52:02,379 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:53:00,822 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:54:06,287 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:55:16,779 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:56:09,711 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:57:49,454 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 18:59:04,057 INFO :: Binance missing 1 candles for BTCUSDT 1m (1715983143315 1715983020000)
+2024-05-17 19:00:01,497 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:01:11,867 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:03:33,042 INFO :: Binance missing 1 candles for BTCUSDT 1m (1715983412295 1715983260000)
+2024-05-17 19:04:07,002 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:05:03,256 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:06:16,161 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:07:03,232 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:08:16,326 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:09:23,320 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:10:14,828 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-17 19:10:57,603 WARNING :: Binance Websocket connection closed
+2024-05-17 19:10:57,833 WARNING :: Bitmex Websocket connection closed
+2024-05-18 09:40:19,539 INFO :: Binance Futures Client succesfully initialized
+2024-05-18 09:40:20,676 INFO :: Bitmex Client succesfully initialized
+2024-05-18 09:40:20,868 INFO :: Binance Websocket connection opened
+2024-05-18 09:40:21,856 INFO :: Bitmex Websocket connection opened
+2024-05-18 09:41:00,784 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:41:06,742 INFO :: Binance Futures current USDT balance = 23077.09549963, trade_size = 0.004
+2024-05-18 09:41:06,742 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 09:41:07,701 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 09:41:10,659 INFO :: Binance order status: filled
+2024-05-18 09:42:04,514 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:43:05,548 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:44:17,543 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:45:05,679 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:46:31,775 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:47:13,266 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:48:00,267 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:49:11,606 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:50:03,476 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:51:06,709 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:52:02,624 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:53:29,868 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:54:01,209 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:55:50,569 WARNING :: Binance Websocket connection closed
+2024-05-18 09:55:50,926 WARNING :: Bitmex Websocket connection closed
+2024-05-18 09:56:44,740 INFO :: Binance Futures Client succesfully initialized
+2024-05-18 09:56:46,153 INFO :: Bitmex Client succesfully initialized
+2024-05-18 09:56:46,202 INFO :: Binance Websocket connection opened
+2024-05-18 09:56:47,231 INFO :: Bitmex Websocket connection opened
+2024-05-18 09:58:10,875 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:59:06,355 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 09:59:07,478 INFO :: Binance Futures current USDT balance = 23093.68443405, trade_size = 0.004
+2024-05-18 09:59:07,479 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 09:59:08,436 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 09:59:11,398 INFO :: Binance order status: filled
+2024-05-18 09:59:12,871 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 09:59:13,839 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 09:59:14,804 INFO :: Binance Futures current USDT balance = 23109.88053391, trade_size = 0.004
+2024-05-18 09:59:14,804 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 09:59:15,172 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 09:59:17,551 INFO :: Binance order status: filled
+2024-05-18 09:59:41,107 INFO :: Take profit for BTCUSDT 1m
+2024-05-18 09:59:42,070 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 09:59:43,036 INFO :: Binance Futures current USDT balance = 23126.17888775, trade_size = 0.004
+2024-05-18 09:59:43,036 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 09:59:43,984 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 09:59:43,985 WARNING :: Binance BTCUSDT: 3080 milliseconds of difference between the current time and the trade time
+2024-05-18 09:59:43,985 WARNING :: Binance BTCUSDT: 2109 milliseconds of difference between the current time and the trade time
+2024-05-18 09:59:46,956 INFO :: Binance order status: filled
+2024-05-18 10:00:05,936 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:00:27,316 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:00:28,281 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:01:15,566 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:01:20,554 INFO :: Binance Futures current USDT balance = 23142.11912156, trade_size = 0.004
+2024-05-18 10:01:20,554 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 10:01:20,924 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 10:01:23,875 INFO :: Binance order status: filled
+2024-05-18 10:01:27,351 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:01:28,314 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:01:53,760 INFO :: Binance Futures current USDT balance = 23157.73001818, trade_size = 0.004
+2024-05-18 10:01:53,760 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 10:01:54,737 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 10:01:57,698 INFO :: Binance order status: filled
+2024-05-18 10:02:07,599 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:02:09,530 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:02:10,497 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:02:28,226 INFO :: Binance Futures current USDT balance = 23173.29908356, trade_size = 0.004
+2024-05-18 10:02:28,226 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:02:28,601 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:02:30,968 INFO :: Binance order status: filled
+2024-05-18 10:02:44,610 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:02:45,571 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:03:02,644 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:04:11,634 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:04:49,997 INFO :: Binance Futures current USDT balance = 23189.0108657, trade_size = 0.004
+2024-05-18 10:04:49,998 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 10:04:50,946 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,947 WARNING :: Binance BTCUSDT: 2178 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,948 WARNING :: Binance BTCUSDT: 2179 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,949 WARNING :: Binance BTCUSDT: 2180 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,950 WARNING :: Binance BTCUSDT: 2181 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,951 WARNING :: Binance BTCUSDT: 2182 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,951 WARNING :: Binance BTCUSDT: 2182 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:50,954 WARNING :: Binance BTCUSDT: 2185 milliseconds of difference between the current time and the trade time
+2024-05-18 10:04:53,905 INFO :: Binance order status: filled
+2024-05-18 10:05:08,743 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:05:08,743 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:05:09,699 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:06:28,350 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:06:29,365 INFO :: Binance Futures current USDT balance = 23202.3413656, trade_size = 0.004
+2024-05-18 10:06:29,365 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 10:06:30,308 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 10:06:30,309 WARNING :: Binance BTCUSDT: 2164 milliseconds of difference between the current time and the trade time
+2024-05-18 10:06:32,716 INFO :: Binance order status: filled
+2024-05-18 10:06:34,722 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:06:35,700 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:06:37,222 INFO :: Binance Futures current USDT balance = 23215.6363433, trade_size = 0.004
+2024-05-18 10:06:37,222 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:06:37,591 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:06:40,872 INFO :: Binance order status: filled
+2024-05-18 10:06:42,687 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:06:43,637 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:06:44,591 INFO :: Binance Futures current USDT balance = 23231.32824963, trade_size = 0.004
+2024-05-18 10:06:44,591 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:06:45,561 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:06:45,562 WARNING :: Binance BTCUSDT: 2122 milliseconds of difference between the current time and the trade time
+2024-05-18 10:06:48,500 INFO :: Binance order status: filled
+2024-05-18 10:06:59,138 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:07:00,101 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:07:01,215 INFO :: Binance Futures current USDT balance = 23244.50359564, trade_size = 0.004
+2024-05-18 10:07:01,215 INFO :: Short signal on BTCUSDT 1m
+2024-05-18 10:07:01,586 INFO :: Sell order placed on Binance | Status: new
+2024-05-18 10:07:01,587 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:07:04,587 INFO :: Binance order status: filled
+2024-05-18 10:07:04,865 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:07:05,231 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:07:05,667 INFO :: Binance Futures current USDT balance = 23257.67902661, trade_size = 0.004
+2024-05-18 10:07:05,667 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:07:06,615 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:07:09,588 INFO :: Binance order status: filled
+2024-05-18 10:07:10,951 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:07:11,906 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:07:18,055 INFO :: Binance Futures current USDT balance = 23270.7727946, trade_size = 0.004
+2024-05-18 10:07:18,055 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:07:19,011 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:07:19,011 WARNING :: Binance BTCUSDT: 2121 milliseconds of difference between the current time and the trade time
+2024-05-18 10:07:21,986 INFO :: Binance order status: filled
+2024-05-18 10:07:22,683 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:07:23,067 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:08:08,949 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:09:10,968 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:09:13,140 INFO :: Binance Futures current USDT balance = 23283.82461084, trade_size = 0.004
+2024-05-18 10:09:13,141 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:09:13,506 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:09:16,466 INFO :: Binance order status: filled
+2024-05-18 10:09:21,217 INFO :: Take profit for BTCUSDT 1m
+2024-05-18 10:09:21,619 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:09:22,580 INFO :: Binance Futures current USDT balance = 23297.59736889, trade_size = 0.004
+2024-05-18 10:09:22,580 INFO :: Long signal on BTCUSDT 1m
+2024-05-18 10:09:22,947 INFO :: Buy order placed on Binance | Status: new
+2024-05-18 10:09:25,906 INFO :: Binance order status: filled
+2024-05-18 10:09:31,187 INFO :: Stop loss for BTCUSDT 1m
+2024-05-18 10:09:32,159 INFO :: Exit order on BTCUSDT 1m placed successfully
+2024-05-18 10:10:02,144 INFO :: Binance New candle for BTCUSDT 1m
+2024-05-18 10:10:53,319 WARNING :: Binance Websocket connection closed
+2024-05-18 10:10:53,550 WARNING :: Bitmex Websocket connection closed

@@ -35,9 +35,10 @@ logger.addHandler(file_handler)
 if __name__== '__main__':
 
     # instanciamos la clase BinanceFuturesClient y le pasamos las keys y el True para referirse a testnet
+    # le agregamos otro boolean para indicar si es futuros o spot
     binance = BinanceFuturesClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
                                     "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
-                                    True)
+                                    True, True)
 
     # contracts = binance.get_contracts()
     # for symbol, contract in contracts.items():

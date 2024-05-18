@@ -120,7 +120,7 @@ class Root(tk.Tk):
 
                         self._trades_frame.body_widgets['pnl_var'][trade.time].set(pnl_str)
                         self._trades_frame.body_widgets['status_var'][trade.time].set(trade.status.capitalize())
-                        self._trades_frame.body_widgets['quantity_var'][trade.time].set(trade.quantity)
+                        #self._trades_frame.body_widgets['quantity_var'][trade.time].set(trade.quantity)
 
             except RuntimeError as e:
                 logger.error("Error while looping through strategies dictionary: %s", e)

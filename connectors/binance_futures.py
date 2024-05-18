@@ -38,13 +38,25 @@ class BinanceFuturesClient:
     # sobre test o sobre real (true or false)
     # Incorporamos los datos de public_key y secret_key y los instanciamos en la clase main
     # el : a un argumento permite especificar el tipo de dato, para hacerlo tipado
-    def __init__(self, public_key: str, secret_key: str, testnet: bool):
-        if testnet:
-            self._base_url = "https://testnet.binancefuture.com"
-            self._wss_url = "wss://stream.binancefuture.com/ws"
+    def __init__(self, public_key: str, secret_key: str, testnet: bool, futures: bool):
+
+        self.futures = futures
+        # si es futuros uso las url de futuros, sino las de spot
+        if self.futures:
+            if testnet:
+                self._base_url = "https://testnet.binancefuture.com"
+                self._wss_url = "wss://stream.binancefuture.com/ws"
+            else:
+                self._base_url = "https://fapi.binance.com"
+                self._wss_url = "wss://fstream.binance.com/ws"
+
         else:
-            self._base_url = "https://fapi.binance.com"
-            self._wss_url = "wss://fstream.binance.com/ws"
+            if testnet:
+                self._base_url = "https://testnet.binance.vision"
+                self._wss_url = "wss://testnet.binance.vision/ws"
+            else:
+                self._base_url = "https://api.binance.com"
+                self._wss_url = "wss://stream.binance.com:9443/ws"
 
         self._public_key = public_key
         self._secret_key = secret_key
@@ -119,8 +131,12 @@ class BinanceFuturesClient:
 
     # --> refiere al tipo que va a devolver el método
     def get_contracts(self) -> typing.Dict[str, Contract]:
-        exchange_info = self._make_request("GET", "/fapi/v1/exchangeInfo", dict())
 
+        # agrego si es futuros o spot
+        if self.futures:
+            exchange_info = self._make_request("GET", "/fapi/v1/exchangeInfo", dict())
+        else:
+            exchange_info = self._make_request("GET", "/api/v3/exchangeInfo", dict())
         contracts = dict()
 
         if exchange_info is not None:
@@ -144,7 +160,10 @@ class BinanceFuturesClient:
         data['interval'] = interval
         data['limit'] = 1000
 
-        raw_candles = self._make_request("GET", "/fapi/v1/klines", data)
+        if self.futures:
+            raw_candles = self._make_request("GET", "/fapi/v1/klines", data)
+        else:
+            raw_candles = self._make_request("GET", "/api/v3/klines", data)
 
         candles = []
 
@@ -157,7 +176,11 @@ class BinanceFuturesClient:
     def get_bid_ask(self, contract: Contract) -> typing.Dict[str, float]:
         data = dict()
         data['symbol'] = contract.symbol
-        ob_data = self._make_request("GET", "/fapi/v1/ticker/bookTicker", data)
+
+        if self.futures:
+            ob_data = self._make_request("GET", "/fapi/v1/ticker/bookTicker", data)
+        else:
+            ob_data = self._make_request("GET", "/api/v3/ticker/bookTicker", data)
 
         if ob_data is not None:
             # si el contract.symbol no está en prices (al principio nunca estará), lo agrega.
@@ -179,7 +202,11 @@ class BinanceFuturesClient:
         data['signature'] = self._generate_signature(data)
 
         balances = dict()
-        account_data = self._make_request("GET", "/fapi/v2/account", data)
+
+        if self.futures:
+            account_data = self._make_request("GET", "/fapi/v2/account", data)
+        else:
+            account_data = self._make_request("GET", "/api/v3/account", data)
 
         if account_data is not None:
             for a in account_data['assets']:
@@ -204,7 +231,10 @@ class BinanceFuturesClient:
         data['timestamp'] = int(time.time() * 1000)
         data['signature'] = self._generate_signature(data)
 
-        order_status = self._make_request("POST", "/fapi/v1/order", data)
+        if self.futures:
+            order_status = self._make_request("POST", "/fapi/v1/order", data)
+        else:
+            order_status = self._make_request("POST", "/api/v3/order", data)
 
         if order_status is not None:
             order_status = OrderStatus(order_status, "binance")
@@ -219,7 +249,10 @@ class BinanceFuturesClient:
         data['timestamp'] = int(time.time() * 1000)
         data['signature'] = self._generate_signature(data)
 
-        order_status = self._make_request("DELETE", "/fapi/v1/order", data)
+        if self.futures:
+            order_status = self._make_request("DELETE", "/fapi/v1/order", data)
+        else:
+            order_status = self._make_request("DELETE", "/api/v3/order", data)
 
         if order_status is not None:
             order_status = OrderStatus(order_status, "binance")
@@ -233,7 +266,10 @@ class BinanceFuturesClient:
         data['orderId'] = order_id
         data['signature'] = self._generate_signature(data)
 
-        order_status = self._make_request("GET", "/fapi/v1/order", data)
+        if self.futures:
+            order_status = self._make_request("GET", "/fapi/v1/order", data)
+        else:
+            order_status = self._make_request("GET", "/api/v3/order", data)
 
         if order_status is not None:
             order_status = OrderStatus(order_status, "binance")
