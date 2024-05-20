@@ -149,9 +149,9 @@ class BinanceClient:
                 # Ahí ya tengo 2. Si tengo más de 100 contratos (hay 306) estaría pasando muchos más de 200
                 # por ende, solo traerá los primeros 200 contratos (solo con bookticker) nunca llegará a
                 # aggTrade y el programa fallará.
-                if contract_data['symbol'] in ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']:
+                #if contract_data['symbol'] in ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']:
                     # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
-                    contracts[contract_data['symbol']] = Contract(contract_data, self.platform)
+                contracts[contract_data['symbol']] = Contract(contract_data, self.platform)
 
         # Sort keys of the dictionary alphabetically
         return collections.OrderedDict(sorted(contracts.items()))
