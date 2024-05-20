@@ -1,6 +1,7 @@
 # models se refiere al data model de python. En este caso crearemos clases para manejar
 # los datos que se obtienen, agrupados en una clase, y poder manejarlos mas fácil que con
 # solo diccionarios.
+# agrego la separación entre futuros y spot de Binance
 
 # https://binance-docs.github.io/apidocs/testnet/en/#account-information-v2-user_data
 import datetime
@@ -12,15 +13,21 @@ import dateutil.parser
 BITMEX_MULTIPLIER = 0.00000001
 BITMEX_TF_MINUTES = {"1m": 1, "5m": 5, "1h": 60, "1d": 1400}
 
+
 class Balance:
     def __init__(self, info, exchange):
 
-        if exchange == "binance":
+        # agrego futuros y spot
+        if exchange == "binance_futures":
             self.initial_margin = float(info['initialMargin'])
             self.maintenance_margin = float(info['maintMargin'])
             self.margin_balance = float(info['marginBalance'])
             self.wallet_balance = float(info['walletBalance'])
             self.unrealized_pnl = float(info['unrealizedProfit'])
+
+        elif exchange == "binance_spot":
+            self.free = float(info['free'])
+            self.locked = float(info['locked'])
 
         elif exchange == "bitmex":
             self.initial_margin = info['initMargin'] * BITMEX_MULTIPLIER
@@ -32,7 +39,7 @@ class Balance:
 
 class Candle:
     def __init__(self, candle_info, timeframe, exchange):
-        if exchange == "binance":
+        if exchange == "binance_futures" or exchange == "binance_spot":
             self.timestamp = candle_info[0]
             self.open = float(candle_info[1])
             self.high = float(candle_info[2])
@@ -62,14 +69,15 @@ class Candle:
             self.close = candle_info['close']
             self.volume = candle_info['volume']
 
-def tick_todecimals(tick_size: float) -> int:
+
+def tick_to_decimals(tick_size: float) -> int:
     # Se usa para convertir el tick_size a string y a un máximo de 8 caracteres, sino mostrara la notación cientifica
     # ilegible tipo 1.43e-05 (como pasa en excel).
 
     tick_size_str = "{0:.8f}".format(tick_size)
 
     # remuevo ceros al inicio del tick_size
-    while tick_size_str[-1]  == "0":
+    while tick_size_str[-1] == "0":
         tick_size_str = tick_size_str[:-1]
 
     split_tick = tick_size_str.split(".")
@@ -80,29 +88,40 @@ def tick_todecimals(tick_size: float) -> int:
         return 0
 
 
-
 # Al implementar otro exchange extra (en este caso Bitmex) el Contract que devuelva el request, va a traer datos,
 # pero su estructura es diferente: así , si bien tendrá un symbol, base asset, etc, los nombres dentro del diccionario
 # ('') van a ser diferentes, por ejemplo  self.base_asset = contract_info['Asset'] podría ser así.
 # entonces necesito meter un if para identificar el exchange previo a la devolución que haga esta clase
 class Contract:
     def __init__(self, contract_info, exchange):
-        if exchange == "binance":
+        if exchange == "binance_futures":
             self.symbol = contract_info['symbol']
             self.base_asset = contract_info['baseAsset']
             self.quote_asset = contract_info['quoteAsset']
-            # Estos últimos 2 se usan para redondear precio y cantidad de una orden a un decimal aceptado por Binance
             self.price_decimals = contract_info['pricePrecision']
             self.quantity_decimals = contract_info['quantityPrecision']
             self.tick_size = 1 / pow(10, contract_info['pricePrecision'])
             self.lot_size = 1 / pow(10, contract_info['quantityPrecision'])
 
+        elif exchange == "binance_spot":
+            self.symbol = contract_info['symbol']
+            self.base_asset = contract_info['baseAsset']
+            self.quote_asset = contract_info['quoteAsset']
+            for b_filter in contract_info['filters']:
+                if b_filter['filterType'] == 'PRICE_FILTER':
+                    self.tick_size = float(b_filter['tickSize'])
+                    self.price_decimals = tick_to_decimals(float(b_filter['tickSize']))
+
+                if b_filter['filterType'] == 'LOT_SIZE':
+                    self.lot_size = float(b_filter['stepSize'])
+                    self.quantity_decimals = tick_to_decimals(float(b_filter['stepSize']))
+
         elif exchange == "bitmex":
             self.symbol = contract_info['symbol']
             self.base_asset = contract_info['rootSymbol']
             self.quote_asset = contract_info['quoteCurrency']
-            self.price_decimals = tick_todecimals(contract_info['tickSize'])
-            self.quantity_decimals = tick_todecimals(contract_info['lotSize'])
+            self.price_decimals = tick_to_decimals(contract_info['tickSize'])
+            self.quantity_decimals = tick_to_decimals(contract_info['lotSize'])
             # Estos últimos 2 se usan para redondear precio y cantidad de una orden a un decimal aceptado por Binance
             self.tick_size = contract_info['tickSize']
             self.lot_size = contract_info['lotSize']
@@ -137,14 +156,23 @@ class Contract_Bitmex:
 
 class OrderStatus:
     def __init__(self, order_info, exchange):
-        if exchange == "binance":
+        if exchange == "binance_futures":
             self.order_id = order_info['orderId']
             self.status = order_info['status'].lower()
             self.avg_price = float(order_info['avgPrice'])
+            self.executed_qty = float(order_info['executedQty'])
+
+        elif exchange == "binance_spot":
+            self.order_id = order_info['orderId']
+            self.status = order_info['status'].lower()
+            self.avg_price = float(order_info['avgPrice'])
+            self.executed_qty = float(order_info['executedQty'])
+
         elif exchange == "bitmex":
             self.order_id = order_info['orderID']
             self.status = order_info['ordStatus'].lower()
             self.avg_price = order_info['avgPx']
+            self.executed_qty = order_info['cumQty']
 
 
 # Creamos una clase Trade para usarla dentro de strategies
@@ -159,4 +187,3 @@ class Trade:
         self.pnl: float = trade_info['pnl']
         self.quantity = trade_info['quantity']
         self.entry_id = trade_info['entry_id']
-

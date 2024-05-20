@@ -5,8 +5,8 @@ from tkinter.messagebox import askquestion
 from interface.styling import *
 from interface.logging_component import Logging
 
-from connectors.bitmex_futures import BitmexClient
-from connectors.binance_futures import BinanceFuturesClient
+from connectors.bitmex import BitmexClient
+from connectors.binance import BinanceClient
 from interface.trades_component import TradesWatch
 from interface.watchlist_component import Watchlist
 from interface.strategy_component import StrategyEditor
@@ -18,7 +18,7 @@ logger = logging.getLogger()
 # hago que herede de tk.Tk
 # Para poder hacer que herede, aparte de mencionarlo debo llamar al super().__init__()
 class Root(tk.Tk):
-    def __init__(self, binance: BinanceFuturesClient, bitmex: BitmexClient):
+    def __init__(self, binance: BinanceClient, bitmex: BitmexClient):
         super().__init__()
 
         self.binance = binance
@@ -52,18 +52,18 @@ class Root(tk.Tk):
 
         # Agrego el frame que llevará el watchlist
         self._watchlist_frame = Watchlist(self.binance.contracts, self.bitmex.contracts, self._left_frame, bg=BG_COLOR)
-        self._watchlist_frame.pack(side=tk.TOP)
+        self._watchlist_frame.pack(side=tk.TOP, padx=10)
 
         # Cambié el estado para hacerlas públicas y poder usar el self.logging_frame desde otro módulo
         self.logging_frame = Logging(self._left_frame, bg=BG_COLOR)
-        self.logging_frame.pack(side=tk.TOP)
+        self.logging_frame.pack(side=tk.TOP, pady=15)
 
         self._strategy_frame = StrategyEditor(self, self.binance, self.bitmex, self._right_frame, bg=BG_COLOR)
-        self._strategy_frame.pack(side=tk.TOP)
+        self._strategy_frame.pack(side=tk.TOP, pady=15)
 
         # Agrego el frame que llevará el trades_component
         self._trades_frame = TradesWatch(self._right_frame, bg=BG_COLOR)
-        self._trades_frame.pack(side=tk.TOP)
+        self._trades_frame.pack(side=tk.TOP, pady=15)
 
         self._update_ui()
 
@@ -109,7 +109,7 @@ class Root(tk.Tk):
                         if trade.time not in self._trades_frame.body_widgets['symbol']:
                             self._trades_frame.add_trade(trade)
                         # si el trade ya está agregado en la interface, puedo hacer update del pnl, etc
-                        if trade.contract.exchange == "binance":
+                        if "binance" in trade.contract.exchange:
                             precision = trade.contract.price_decimals
                         else:
                             # Bitmex siempre muestra los saldos en bitcoin (por eso 8 decimales)
@@ -120,7 +120,7 @@ class Root(tk.Tk):
 
                         self._trades_frame.body_widgets['pnl_var'][trade.time].set(pnl_str)
                         self._trades_frame.body_widgets['status_var'][trade.time].set(trade.status.capitalize())
-                        #self._trades_frame.body_widgets['quantity_var'][trade.time].set(trade.quantity)
+                        self._trades_frame.body_widgets['quantity_var'][trade.time].set(trade.quantity)
 
             except RuntimeError as e:
                 logger.error("Error while looping through strategies dictionary: %s", e)

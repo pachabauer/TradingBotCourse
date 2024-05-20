@@ -2,6 +2,7 @@ import logging
 import time
 
 import requests
+import collections
 
 # libreria para hacer más fácil y clara la lectura de los print()
 import pprint
@@ -31,7 +32,7 @@ logger = logging.getLogger()
 
 
 # hacemos una clase que contendrá varios métodos relacionados
-class BinanceFuturesClient:
+class BinanceClient:
 
     # el constructor es __init__
     # testnet es un boolean que se usa de entrada (en este caso) para identificar si trabajamos
@@ -43,6 +44,7 @@ class BinanceFuturesClient:
         self.futures = futures
         # si es futuros uso las url de futuros, sino las de spot
         if self.futures:
+            self.platform = "binance_futures"
             if testnet:
                 self._base_url = "https://testnet.binancefuture.com"
                 self._wss_url = "wss://stream.binancefuture.com/ws"
@@ -51,6 +53,7 @@ class BinanceFuturesClient:
                 self._wss_url = "wss://fstream.binance.com/ws"
 
         else:
+            self.platform = "binance_spot"
             if testnet:
                 self._base_url = "https://testnet.binance.vision"
                 self._wss_url = "wss://testnet.binance.vision/ws"
@@ -146,11 +149,12 @@ class BinanceFuturesClient:
                 # Ahí ya tengo 2. Si tengo más de 100 contratos (hay 306) estaría pasando muchos más de 200
                 # por ende, solo traerá los primeros 200 contratos (solo con bookticker) nunca llegará a
                 # aggTrade y el programa fallará.
-                if contract_data['symbol'] in ['BTCUSDT', 'ETHUSDT','BNBUSDT', 'SOLUSDT']:
+                if contract_data['symbol'] in ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']:
                     # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
-                    contracts[contract_data['symbol']] = Contract(contract_data, "binance")
+                    contracts[contract_data['symbol']] = Contract(contract_data, self.platform)
 
-        return contracts
+        # Sort keys of the dictionary alphabetically
+        return collections.OrderedDict(sorted(contracts.items()))
 
     # para definir el tipo de dato de contract, especifico su model (su clase).
     # a su vez, puedo especificar el tipo de dato que devuelve el método con -> y el typing correspondiente
@@ -169,7 +173,7 @@ class BinanceFuturesClient:
 
         if raw_candles is not None:
             for c in raw_candles:
-                candles.append(Candle(c, interval, "binance"))
+                candles.append(Candle(c, interval, self.platform))
 
         return candles
 
@@ -209,8 +213,12 @@ class BinanceFuturesClient:
             account_data = self._make_request("GET", "/api/v3/account", data)
 
         if account_data is not None:
-            for a in account_data['assets']:
-                balances[a['asset']] = Balance(a, "binance")
+            if self.futures:
+                for a in account_data['assets']:
+                    balances[a['asset']] = Balance(a, self.platform)
+            else:
+                for a in account_data['balances']:
+                    balances[a['asset']] = Balance(a, self.platform)
 
         return balances
 
@@ -219,12 +227,14 @@ class BinanceFuturesClient:
         data = dict()
         data['symbol'] = contract.symbol
         data['side'] = side.upper()
-        data['quantity'] = round(round(quantity / contract.lot_size) * contract.lot_size, 8)
-        data['type'] = order_type
+        data['quantity'] = round(int(quantity / contract.lot_size) * contract.lot_size, 8)
+        data['type'] = order_type.upper()
 
         # Son los argumentos no mandatorios, es decir no obligatorios
         if price is not None:
             data['price'] = round(round(price / contract.tick_size) * contract.tick_size, 8)
+            # Avoids scientific notation
+            data['price'] = '%.*f' % (contract.price_decimals, data['price'])
         if tif is not None:
             data['timeInForce'] = tif
 
@@ -237,15 +247,20 @@ class BinanceFuturesClient:
             order_status = self._make_request("POST", "/api/v3/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status, "binance")
+            if not self.futures:
+                if order_status['status'] == "FILLED":
+                    order_status['avgPrice'] = self._get_execution_price(contract, order_status['orderId'])
+                else:
+                    order_status['avgPrice'] = 0
+
+            order_status = OrderStatus(order_status, self.platform)
 
         return order_status
 
     def cancel_order(self, contract: Contract, order_id: int) -> OrderStatus:
         data = dict()
-        data['symbol'] = contract.symbol
         data['orderId'] = order_id
-
+        data['symbol'] = contract.symbol
         data['timestamp'] = int(time.time() * 1000)
         data['signature'] = self._generate_signature(data)
 
@@ -255,9 +270,45 @@ class BinanceFuturesClient:
             order_status = self._make_request("DELETE", "/api/v3/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status, "binance")
+            if not self.futures:
+                # Get the average execution price based on the recent trades
+                order_status['avgPrice'] = self._get_execution_price(contract, order_id)
+            order_status = OrderStatus(order_status, self.platform)
 
         return order_status
+
+    def _get_execution_price(self, contract: Contract, order_id: int) -> float:
+
+        """
+        For Binance Spot only, find the equivalent of the 'avgPrice' key on the futures side.
+        The average price is the weighted sum of each trade price related to the order_id
+        :param contract:
+        :param order_id:
+        :return:
+        """
+
+        data = dict()
+        data['timestamp'] = int(time.time() * 1000)
+        data['symbol'] = contract.symbol
+        data['signature'] = self._generate_signature(data)
+
+        trades = self._make_request("GET", "/api/v3/myTrades", data)
+
+        avg_price = 0
+
+        if trades is not None:
+
+            executed_qty = 0
+            for t in trades:
+                if t['orderId'] == order_id:
+                    executed_qty += float(t['qty'])
+
+            for t in trades:
+                if t['orderId'] == order_id:
+                    fill_pct = float(t['qty']) / executed_qty
+                    avg_price += (float(t['price']) * fill_pct)  # Weighted sum
+
+        return round(round(avg_price / contract.tick_size) * contract.tick_size, 8)
 
     def get_order_status(self, contract: Contract, order_id: int) -> OrderStatus:
         data = dict()
@@ -272,7 +323,14 @@ class BinanceFuturesClient:
             order_status = self._make_request("GET", "/api/v3/order", data)
 
         if order_status is not None:
-            order_status = OrderStatus(order_status, "binance")
+            if not self.futures:
+                if order_status['status'] == "FILLED":
+                    # Get the average execution price based on the recent trades
+                    order_status['avgPrice'] = self._get_execution_price(contract, order_id)
+                else:
+                    order_status['avgPrice'] = 0
+
+            order_status = OrderStatus(order_status, self.platform)
 
         return order_status
 
@@ -280,7 +338,7 @@ class BinanceFuturesClient:
 
         # lleva como argumentos: url y callback functions
         self.ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close,
-                                          on_error=self._on_error, on_message=self._on_message)
+                                         on_error=self._on_error, on_message=self._on_message)
 
         # inicia el loop infinito esperando mensajes del websocket server
         # Si llega a dar error o se cae la conexión, espera 2 segundos para reconectarse automaticamente
@@ -296,18 +354,26 @@ class BinanceFuturesClient:
 
     def _on_open(self, ws):
         logger.info("Binance Websocket connection opened")
+        self.ws_connected = True
         # Acá se suscribe al channel bookTicker
         # Las suscripciones a canales deberían hacerse a "demanda" de cuando doy de alta una estrategia,
         # le suscribo el contrato que doy de alta.
-        self.subscribe_channel(list(self.contracts.values()), "bookTicker")
+        # The aggTrade channel is subscribed to in the _switch_strategy() method of strategy_component.py
+
+        for channel in ["bookTicker", "aggTrade"]:
+            for symbol in self.ws_subscriptions[channel]:
+                self.subscribe_channel([self.contracts[symbol]], channel, reconnection=True)
+
+        if "BTCUSDT" not in self.ws_subscriptions["bookTicker"]:
+            self.subscribe_channel([self.contracts["BTCUSDT"]], "bookTicker")
 
         # Si esto da un error "invalid close opcode" Es porque Binance permite suscribir un máximo de 200 contratos con
         # una sola conexión.
         # ver minuto 7.15 en adelante del video 41
-        self.subscribe_channel(list(self.contracts.values()), "aggTrade")
 
     def _on_close(self, ws):
         logger.warning("Binance Websocket connection closed")
+        self.ws_connected = False
 
     def _on_error(self, ws, msg: str):
         logger.error("Binance Websocket connection error: %s", msg)
@@ -315,6 +381,11 @@ class BinanceFuturesClient:
     def _on_message(self, ws, msg: str):
         # Una vez recibidos los datos del ws, convierto el jsonString a jsonObject, a fin de mostrarlo claramente
         data = json.loads(msg)
+
+        if "u" in data and "A" in data:
+            # For Binance Spot, to make the data structure uniform with Binance Futures
+            # See the data structure difference here: https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-book-ticker-streams
+            data['e'] = "bookTicker"
 
         # la e se refiere al evento (al canal) del cual estoy recibiendo la información
         if "e" in data:
@@ -354,27 +425,38 @@ class BinanceFuturesClient:
                         res = strat.parse_trades(float(data['p']), float(data['q']), data['T'])
                         strat.check_trade(res)
 
+
     # Para obtener data, necesito suscribirme a "canales". Esto es, una especie de endpoint, que envía datos
     # los cuales son recibidos por el ws y transmitidos al programa
     # https://binance-docs.github.io/apidocs/testnet/en/#live-subscribing-unsubscribing-to-streams
-    def subscribe_channel(self, contracts: typing.List[Contract], channel: str):
+    def subscribe_channel(self, contracts: typing.List[Contract], channel: str, reconnection=False):
+        if len(contracts) > 200:
+            logger.warning("Subscribing to more than 200 symbols will most likely fail. "
+                           "Consider subscribing only when adding a symbol to your Watchlist or when starting a "
+                           "strategy for a symbol.")
+
         data = dict()
         data['method'] = "SUBSCRIBE"
         data['params'] = []
 
-        for contract in contracts:
-            # ver documentación : ticker en minusculas mas el @ y el bookTicker
-            data['params'].append(contract.symbol.lower() + "@" + channel)
+        if len(contracts) == 0:
+            data['params'].append(channel)
+        else:
+            for contract in contracts:
+                if contract.symbol not in self.ws_subscriptions[channel] or reconnection:
+                    data['params'].append(contract.symbol.lower() + "@" + channel)
+                    if contract.symbol not in self.ws_subscriptions[channel]:
+                        self.ws_subscriptions[channel].append(contract.symbol)
+
+        if len(data['params']) == 0:
+            return
         data['id'] = self._ws_id
 
-        # La función json.dumps() convertirá un subconjunto de objetos de Python en una cadena json.
-        # No todos los objetos son convertibles
-        # es posible que necesites crear un diccionario de datos antes de serializarlos a JSON
-        # Hago esto ya que necesito pasarle un JSON String al self.ws.send()
         try:
             self.ws.send(json.dumps(data))
+            logger.info("Binance: subscribing to: %s", ','.join(data['params']))
         except Exception as e:
-            logger.error("Websocket error while subscribing to %s %s updates: %s", len(contracts), channel, e)
+            logger.error("Websocket error while subscribing to @bookTicker and @aggTrade: %s", e)
 
         self._ws_id += 1
 
@@ -383,13 +465,25 @@ class BinanceFuturesClient:
     # entrar como posición.
     def get_trade_size(self, contract: Contract, price: float, balance_pct: float):
 
+        """
+               Compute the trade size for the strategy module based on the percentage of the balance to use
+               that was defined in the strategy component.
+               :param contract:
+               :param price: Used to convert the amount to invest into an amount to buy/sell
+               :param balance_pct:
+               :return:
+               """
+
+        logger.info("Getting Binance trade size...")
+
         # averiguamos si el balance está updateado.
         balance = self.get_balances()
         if balance is not None:
-            # Definimos que usaremos USDT para operar. OJO con esto porque si usamos otro stable o crypto no
-            # funcionará el trade, ya que no lo estamos definiendo como moneda de margen.
-            if 'USDT' in balance:
-                balance = balance['USDT'].wallet_balance
+            if contract.quote_asset in balance:  # On Binance Spot, the quote asset isn't necessarily USDT
+                if self.futures:
+                    balance = balance[contract.quote_asset].wallet_balance
+                else:
+                    balance = balance[contract.quote_asset].free
             else:
                 return None
         else:
@@ -400,6 +494,6 @@ class BinanceFuturesClient:
         # cantidad de USDT a usar redondeados a 8 decimales máximo.
         trade_size = round(round(trade_size / contract.lot_size) * contract.lot_size, 8)
         # loggeo la información
-        logger.info("Binance Futures current USDT balance = %s, trade_size = %s", balance, trade_size)
+        logger.info("Binance current %s balance = %s, trade size = %s", contract.quote_asset, balance, trade_size)
 
         return trade_size

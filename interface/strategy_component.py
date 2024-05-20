@@ -5,8 +5,8 @@ import tkinter as tk
 import typing
 from interface.styling import *
 from interface.scrollable_frame import ScrollableFrame
-from connectors.binance_futures import BinanceFuturesClient
-from connectors.bitmex_futures import BitmexClient
+from connectors.binance import BinanceClient
+from connectors.bitmex import BitmexClient
 from strategies import TechnicalStrategy, BreakoutStrategy
 from utils import *
 from database import WorkspaceData
@@ -22,7 +22,7 @@ class StrategyEditor(tk.Frame):
     # necesitaré acceder a los conectores debido a que voy a detener la conexión a un exchange y conectarme al otro
     # y viceversa.
 
-    def __init__(self, root: "Root", binance: BinanceFuturesClient, bitmex: BitmexClient, *args, **kwargs):
+    def __init__(self, root: "Root", binance: BinanceClient, bitmex: BitmexClient, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Creo la variable de instancia que pasé como argumento, ya que así podré acceder al método add_log() del
@@ -169,6 +169,7 @@ class StrategyEditor(tk.Frame):
 
             elif base_param['widget'] == tk.Entry:
                 self.body_widgets[code_name][b_index] = tk.Entry(self._body_frame.sub_frame, justify=tk.CENTER,
+                                                                 bg=BG_COLOR2, fg=FG_COLOR,
                                                                  font=GLOBAL_FONT, bd=1,
                                                                  width=base_param['width'])
 
@@ -176,11 +177,11 @@ class StrategyEditor(tk.Frame):
                 # una tecla validate =  "key" (key es una tecla). %P es lo que indica cual será el argumento
                 # de la callback function (self_validate_key), en este caso un texto nuevo ="%P"
                 if base_param['data_type'] == int:
-                    self.body_widgets[code_name][b_index].config(validate="key", validatecommand=(
+                    self.body_widgets[code_name][b_index].config(validate='key', validatecommand=(
                         self._valid_integer, "%P"))
 
                 elif base_param['data_type'] == float:
-                    self.body_widgets[code_name][b_index].config(validate="key", validatecommand=(
+                    self.body_widgets[code_name][b_index].config(validate='key', validatecommand=(
                         self._valid_float, "%P"))
 
             elif base_param['widget'] == tk.Button:
@@ -262,10 +263,10 @@ class StrategyEditor(tk.Frame):
                 # una tecla validate =  "key" (key es una tecla). %P es lo que indica cual será el argumento
                 # de la callback function (self_validate_key), en este caso un texto nuevo ="%P"
                 if param['data_type'] == int:
-                    self._extra_input[code_name].config(validate="key", validatecommand=(self._valid_integer, "%P"))
+                    self._extra_input[code_name].config(validate='key', validatecommand=(self._valid_integer, "%P"))
 
                 elif param['data_type'] == float:
-                    self._extra_input[code_name].config(validate="key", validatecommand=(self._valid_float, "%P"))
+                    self._extra_input[code_name].config(validate='key', validatecommand=(self._valid_float, "%P"))
 
                 if self.additional_parameters[b_index][code_name] is not None:
                     self._extra_input[code_name].insert(tk.END, str(self.additional_parameters[b_index][code_name]))
@@ -359,8 +360,9 @@ class StrategyEditor(tk.Frame):
                 return
 
             if exchange == "Binance":
-                self._exchanges[exchange].subscribe_channel([contract], "bookTicker")
                 self._exchanges[exchange].subscribe_channel([contract], "aggTrade")
+                self._exchanges[exchange].subscribe_channel([contract], "bookTicker")
+
 
             # si el len es succesful , avanzamos
             self._exchanges[exchange].strategies[b_index] = new_strategy

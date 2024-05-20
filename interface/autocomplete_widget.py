@@ -10,7 +10,7 @@ class Autocomplete(tk.Entry):
 
         self._symbols = symbols
         # Creo el listbox en blanco
-        self._lb = tk.Listbox()
+        self._lb: tk.Listbox
         # Establezco un boolean para que no se cree un listbox cada vez que presione una key
         self._lb_open = False
 
@@ -55,7 +55,7 @@ class Autocomplete(tk.Entry):
                     pass
 
                 # inserto los símbolos que van coincidiendo en la listbox
-                for symbol in symbols_matched:
+                for symbol in symbols_matched[:8]:
                     self._lb.insert(tk.END, symbol)
 
             else:
@@ -86,10 +86,10 @@ class Autocomplete(tk.Entry):
             if index > 0 and event.keysym == "Up":
                 self._lb.select_clear(first=index)
                 index = str(index - 1)
-                self._lb.selection_set(first=str(index))
+                self._lb.selection_set(first=index)
                 self._lb.activate(index)
             elif index < lb_size - 1 and event.keysym == "Down":
                 self._lb.select_clear(first=index)
                 index = str(index + 1)
-                self._lb.selection_set(first=str(index))
+                self._lb.selection_set(first=index)
                 self._lb.activate(index)

@@ -20,7 +20,7 @@ class TradesWatch(tk.Frame):
         self._table_frame = tk.Frame(self, bg=BG_COLOR)
         self._table_frame.pack(side=tk.TOP)
 
-        self._col_width = 11
+        self._col_width = 12
         # agrego el scrollable subframe personalizado
         self._headers_frame = tk.Frame(self._table_frame, bg=BG_COLOR)
 
@@ -53,7 +53,7 @@ class TradesWatch(tk.Frame):
             self.body_widgets[h] = dict()
             # Aca agrego las variables que alimentarán mas adelante el widget en el método
             # add_symbol() (solo bid y ask, ya que son valores variables)
-            if h in ["status", "pnl"]:
+            if h in ["status", "pnl", "quantity"]:
                 self.body_widgets[h + "_var"] = dict()
 
         self._body_index = 0
@@ -91,9 +91,14 @@ class TradesWatch(tk.Frame):
                                                       , width=self._col_width)
         self.body_widgets['side'][t_index].grid(row=b_index, column=4)
 
-        self.body_widgets['quantity'][t_index] = tk.Label(self._body_frame.sub_frame, text=trade.quantity, bg=BG_COLOR,
-                                                          fg=FG_COLOR_2,
-                                                          font=GLOBAL_FONT, width=self._col_width)
+        # Quantity
+
+        # Variable because the order is not always filled immediately
+        self.body_widgets['quantity_var'][t_index] = tk.StringVar()
+        self.body_widgets['quantity'][t_index] = tk.Label(self._body_frame.sub_frame,
+                                                          textvariable=self.body_widgets['quantity_var'][t_index],
+                                                          bg=BG_COLOR, fg=FG_COLOR_2, font=GLOBAL_FONT,
+                                                          width=self._col_width)
         self.body_widgets['quantity'][t_index].grid(row=b_index, column=5)
 
         self.body_widgets['status_var'][t_index] = tk.StringVar()

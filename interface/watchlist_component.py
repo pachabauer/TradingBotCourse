@@ -39,20 +39,20 @@ class Watchlist(tk.Frame):
         # Acá ponemos los entry boxes (para ingresar la crypto a buscar y agregar a la watchlist
         # insertbackground es el color del cursor dentro del entry
         self._binance_entry = Autocomplete( self.binance_symbols, self._commands_frame, fg=FG_COLOR, justify=tk.CENTER,
-                                            insertbackground=FG_COLOR, bg=BG_COLOR2)
+                                            insertbackground=FG_COLOR, bg=BG_COLOR2, highlightthickness=False)
 
         # bind() nos permite agregar una funcionalidad al entry, en este caso cuando presiono enter, llama al
         # callback _add_binance_symbol
         self._binance_entry.bind("<Return>", self._add_binance_symbol)
 
-        self._binance_entry.grid(row=1, column=0)
+        self._binance_entry.grid(row=1, column=0, padx=5)
 
         self._bitmex_label = tk.Label(self._commands_frame, text="Bitmex", bg=BG_COLOR, fg=FG_COLOR, font=BOLD_FONT)
         # especifico que ira top left, pero en la segunda columna (column=1)
         self._bitmex_label.grid(row=0, column=1)
 
         self._bitmex_entry = Autocomplete(self.bitmex_symbols, self._commands_frame, fg=FG_COLOR, justify=tk.CENTER,
-                                          insertbackground=FG_COLOR, bg=BG_COLOR2)
+                                          insertbackground=FG_COLOR, bg=BG_COLOR2, highlightthickness=False)
         self._bitmex_entry.bind("<Return>", self._add_bitmex_symbol)
         self._bitmex_entry.grid(row=1, column=1)
 
@@ -62,7 +62,7 @@ class Watchlist(tk.Frame):
 
         self._headers_frame = tk.Frame(self._table_frame, bg=BG_COLOR)
 
-        self._col_width = 11
+        self._col_width = 13
 
         # la función enumerate nos permite acceder al mismo tiempo al valor del elemento de la lista (h)
         # y a la posición (idx)

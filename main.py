@@ -1,14 +1,14 @@
 import tkinter as tk
 import logging
-from connectors.binance_futures import BinanceFuturesClient
-from connectors.bitmex_futures import BitmexClient
+from connectors.binance import BinanceClient
+from connectors.bitmex import BitmexClient
 
 from interface.root_component import Root
 
 logger = logging.getLogger()
 
-#se setea el mínimo nivel de logging --> INFO indica que solo info, warning and error serán mostrados
-logger.setLevel(logging.INFO)
+# se setea el mínimo nivel de logging --> INFO indica que solo info, warning and error serán mostrados
+logger.setLevel(logging.DEBUG)
 
 # lo usamos para enviar el mensaje de logging para que se vea en la consola
 stream_handler = logging.StreamHandler()
@@ -32,13 +32,12 @@ logger.addHandler(file_handler)
 # logger.warning("This message is about something you should pay attention to")
 # logger.error("This message helps to debug an error that occurred in your program")
 
-if __name__== '__main__':
-
+if __name__ == '__main__':
     # instanciamos la clase BinanceFuturesClient y le pasamos las keys y el True para referirse a testnet
     # le agregamos otro boolean para indicar si es futuros o spot
-    binance = BinanceFuturesClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
-                                    "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
-                                    True, True)
+    binance = BinanceClient("15cafcccb0b80222a789be92c7d19314efea7cdf6cf275438d0ba519babbdbb1",
+                            "95027f038a128c189761aef63abbb5ef8bb8654c64d004b0e85443b44866530c",
+                            testnet=True, futures=True)
 
     # contracts = binance.get_contracts()
     # for symbol, contract in contracts.items():
@@ -49,7 +48,7 @@ if __name__== '__main__':
     #     print(f"Precisión de la Cantidad: {contract.quantity_decimals}")
     #     print()
 
-    bitmex = BitmexClient('IrMjnDtKOJPa4vKQdY8eEFmK', 'RmxMg044vAPb2Kr8uF1YUbUzElba_yVoG3XKolFuXv2kcPGW', True)
+    bitmex = BitmexClient('IrMjnDtKOJPa4vKQdY8eEFmK', 'RmxMg044vAPb2Kr8uF1YUbUzElba_yVoG3XKolFuXv2kcPGW', testnet=True)
 
     root = Root(binance, bitmex)
 

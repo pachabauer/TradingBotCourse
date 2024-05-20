@@ -4,6 +4,7 @@ import requests
 import hmac
 import hashlib
 import websocket
+import collections
 import json
 import typing
 import dateutil.parser
@@ -20,6 +21,11 @@ logger = logging.getLogger()
 class BitmexClient:
 
     def __init__(self, public_key: str, secret_key: str, testnet: bool):
+
+        # Agrego futuros
+        self.futures = True
+        self.platform = "bitmex"
+
         if testnet:
             self._base_url = "https://testnet.bitmex.com"
             self._wss_url = "wss://testnet.bitmex.com/realtime"
@@ -47,8 +53,6 @@ class BitmexClient:
         # agrego una lista de logs, que son los que se van a ir mostrando en la interface visual al usuario
         self.logs = []
 
-
-
         # Hay 3 diferencias entre el WS de Bitmex y Binance:
         #   1- La URL
         #   2- La data que recibimos en el on_message() está estructurada diferente
@@ -62,7 +66,7 @@ class BitmexClient:
 
     def _add_log(self, msg: str):
         logger.info("%s", msg)
-        self.logs.append({"log":msg, "displayed":False})
+        self.logs.append({"log": msg, "displayed": False})
 
     # Acá cambian la cantidad de parámetros para el signature, ya que así lo especifica la documentación de Bitmex.
     def _generate_signature(self, method: str, endpoint: str, expires: str, data: typing.Dict) -> str:
@@ -122,11 +126,11 @@ class BitmexClient:
         contracts = dict()
 
         if instruments is not None:
-            for instrument_data in instruments:
-                # estructura de diccionario (key,data), siendo el pair la key y la data es toda la lista
-                contracts[instrument_data['symbol']] = Contract(instrument_data, "bitmex")
+            for s in instruments:
+                contracts[s['symbol']] = Contract(s, "bitmex")
 
-        return contracts
+        # Sort keys of the dictionary alphabetically
+        return collections.OrderedDict(sorted(contracts.items()))
 
     def get_balances(self) -> typing.Dict[str, Balance]:
         # genero los datos para identificarse, para pasarle al make_request().
@@ -159,8 +163,12 @@ class BitmexClient:
         candles = []
 
         if raw_candles is not None:
-            for candle in reversed(raw_candles):
-                candles.append(Candle(candle, timeframe, "bitmex"))
+            for c in reversed(raw_candles):
+
+                # Some candles returned by Bitmex miss data
+                if c['open'] is None or c['close'] is None:
+                    continue
+                candles.append(Candle(c, timeframe, "bitmex"))
 
         return candles
 
@@ -171,15 +179,15 @@ class BitmexClient:
         data['symbol'] = contract.symbol
         data['side'] = side.capitalize()
         data['orderQty'] = round(quantity / contract.lot_size) * contract.lot_size
-        data['orderType'] = order_type.capitalize()
+        data['ordType'] = order_type.capitalize()
 
         if price is not None:
-            data['price'] = round(round(price / contract.tick_size) * contract.tick_size,8)
+            data['price'] = round(round(price / contract.tick_size) * contract.tick_size, 8)
 
         if tif is not None:
             data['timeInForce'] = tif
 
-        order_status = self._make_request('POST', '/api/v1/order', data)
+        order_status = self._make_request("POST", "/api/v1/order", data)
 
         if order_status is not None:
             order_status = OrderStatus(order_status, "bitmex")
@@ -191,7 +199,7 @@ class BitmexClient:
 
         data['orderID'] = order_id
 
-        order_status = self._make_request('DELETE', '/api/v1/order', data)
+        order_status = self._make_request("DELETE", "/api/v1/order", data)
 
         if order_status is not None:
             # trae una lista de diccionarios el DELETE, ya que podemos cancelar mas de 1 orden con un request.
@@ -211,7 +219,7 @@ class BitmexClient:
         # primero.
         data['reverse'] = True
 
-        order_status = self._make_request('GET', '/api/v1/order', data)
+        order_status = self._make_request("GET", "/api/v1/order", data)
 
         if order_status is not None:
             for order in order_status:
@@ -224,7 +232,7 @@ class BitmexClient:
 
         # lleva como argumentos: url y callback functions
         self.ws = websocket.WebSocketApp(self._wss_url, on_open=self._on_open, on_close=self._on_close,
-                                          on_error=self._on_error, on_message=self._on_message)
+                                         on_error=self._on_error, on_message=self._on_message)
 
         # inicia el loop infinito esperando mensajes del websocket server
         # Si llega a dar error o se cae la conexión, espera 2 segundos para reconectarse automaticamente
@@ -243,7 +251,7 @@ class BitmexClient:
     def _on_open(self, ws):
         logger.info("Bitmex Websocket connection opened")
         # Acá se suscribe al channel instrument
-        self.subscribe_channel('instrument')
+        self.subscribe_channel("instrument")
 
         # Acá se suscribe al channel trade para sacar datos de las velas del websocket
         self.subscribe_channel("trade")
@@ -290,7 +298,7 @@ class BitmexClient:
 
                                         if trade.contract.inverse:
                                             if trade.side == "long":
-                                                trade.pnl = (1 / trade.entry_price -1 / price) * multiplier \
+                                                trade.pnl = (1 / trade.entry_price - 1 / price) * multiplier \
                                                             * trade.quantity
                                             elif trade.side == "short":
                                                 trade.pnl = (1 / price - 1 / trade.entry_price) * multiplier \
@@ -322,7 +330,6 @@ class BitmexClient:
                             res = strat.parse_trades(float(d['price']), float(d['size']), ts)
                             strat.check_trade(res)
 
-
     def subscribe_channel(self, topic: str):
         data = dict()
         data['op'] = "subscribe"
@@ -337,7 +344,6 @@ class BitmexClient:
             self.ws.send(json.dumps(data))
         except Exception as e:
             logger.error("Websocket error while subscribing to %s %s", topic, e)
-
 
     # Determino el tamaño del trade en base a lo establecido en la UI (el número que paso)
     # Necesito pasar como parámetro el contract para determinar a través del redondeo (round) la cant que voy a
@@ -371,4 +377,3 @@ class BitmexClient:
         logger.info("Bitmex current XBT Balance = %s, contracts_number = %s", balance, contracts_number)
 
         return int(contracts_number)
-

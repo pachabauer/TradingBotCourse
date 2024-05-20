@@ -12,8 +12,8 @@ from threading import Timer
 # circular. Pero poniendo el TYPE_CHECKING, evitamos este error, ya que al encontrarlos en otro módulo, los podremos
 # usar en este, pero sin importarlos acá mismo
 if TYPE_CHECKING:
-    from connectors.bitmex_futures import BitmexClient
-    from connectors.binance_futures import BinanceFuturesClient
+    from connectors.bitmex import BitmexClient
+    from connectors.binance import BinanceClient
 
 logger = logging.getLogger()
 
@@ -26,7 +26,7 @@ class Strategy:
     # Agrego el Union y las opciones van entre "" para poder usarlas, debido al TYPE_CHECKING
     # Agrego el nombre de la estrategia como parámetro para pasarlo dentro del objeto nuevo creado en models Trade
     # que pide guardar la estrategia en el nuevo trade
-    def __init__(self, client: Union["BitmexClient", "BinanceFuturesClient"], contract: Contract, exchange: str,
+    def __init__(self, client: Union["BitmexClient", "BinanceClient"], contract: Contract, exchange: str,
                  timeframe: str, balance_pct: float, take_profit: float, stop_loss: float, strat_name):
 
         # Atributos comunes a cualquier estrategia del TradingBot
@@ -39,7 +39,7 @@ class Strategy:
         self.take_profit = take_profit
         self.stop_loss = stop_loss
 
-        self.stat_name = strat_name
+        self.strat_name = strat_name
 
         self.ongoing_position = False
 
@@ -156,6 +156,7 @@ class Strategy:
                 for trade in self.trades:
                     if trade.entry_id == order_id:
                         trade.entry_price = order_status.avg_price
+                        trade.quantity = order_status.executed_qty
                         break
                 return
 
@@ -199,8 +200,8 @@ class Strategy:
 
             # Va a ser una lista que guarde el Trade.
             new_trade = Trade({"time": int(time.time() * 1000), "entry_price": avg_fill_price,
-                               "contract": self.contract, "strategy": self.stat_name, "side": position_side,
-                               "status": "open", "pnl": 0, "quantity": trade_size, "entry_id": order_status.order_id})
+                               "contract": self.contract, "strategy": self.strat_name, "side": position_side,
+                               "status": "open", "pnl": 0, "quantity": order_status.executed_qty, "entry_id": order_status.order_id})
 
             self.trades.append(new_trade)
 
@@ -236,9 +237,18 @@ class Strategy:
         # Si alguno de los 2 es True mandamos log que informa el exit position
         if tp_triggered or sl_triggered:
 
-            self._add_log(f"{'Stop loss' if sl_triggered else 'Take profit'} for {self.contract.symbol} {self.tf}")
+            self._add_log(f"{'Stop loss' if sl_triggered else 'Take profit'} for {self.contract.symbol} {self.tf}"
+                          f"| Current Price = {price} (Entry price was {trade.entry_price})")
             # Informo la parte contraria SELL si estaba long, BUY si estaba short
             order_side = "SELL" if trade.side == "long" else "BUY"
+
+            if not self.client.futures:
+                # Make sure we don't sell more than what's in the available balance on Binance Spot
+                current_balances = self.client.get_balances()
+                if current_balances is not None:
+                    if order_side == "SELL" and self.contract.base_asset in current_balances:
+                        trade.quantity = min(current_balances[self.contract.base_asset].free, trade.quantity)
+
             order_status = self.client.place_order(self.contract, "MARKET", trade.quantity, order_side)
 
             if order_status is not None:
@@ -349,7 +359,7 @@ class BreakoutStrategy(Strategy):
         super().__init__(client, contract, exchange, timeframe, balance_pct, take_profit, stop_loss, "Breakout")
 
         # Atributos particulares de la clase
-        self.min_volume = other_params['min_volume']
+        self._min_volume = other_params['min_volume']
 
     # método para determinar si debemos ir long o short y definir cómo actua la estrategia. Fundamental
     # definir cómo actua la estrategia acá, en check_signal()
@@ -357,10 +367,10 @@ class BreakoutStrategy(Strategy):
         # return un int ya que si es long será 1 , short -1 , nada 0
 
         # long
-        if self.candles[-1].close > self.candles[-2].high and self.candles[-1].volume > self.min_volume:
+        if self.candles[-1].close > self.candles[-2].high and self.candles[-1].volume > self._min_volume:
             return 1
         # short
-        elif self.candles[-1].close < self.candles[-2].low and self.candles[-1].volume > self.min_volume:
+        elif self.candles[-1].close < self.candles[-2].low and self.candles[-1].volume > self._min_volume:
             return -1
         else:
             return 0
